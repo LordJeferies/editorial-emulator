@@ -1,28 +1,59 @@
-# Editorial Emulator V2.5
+# Editorial Emulator V2.7
 
-Aplicación separada de Editorial OS enfocada en **escenarios, planificación visual, Play y simulación persistente de feeds**.
+Aplicación separada de Editorial OS enfocada en **escenarios, planificación visual, Play y simulación de feeds**.
 
-## Corrección crítica V2.5
+## V2.7
 
-V2.4 contenía un error de sintaxis en `ui-v24.js` dentro del cierre de `scenarioCreate()`. El navegador podía cargar correctamente la landing, pero el módulo no terminaba de parsear; por eso **Usar escenario existente** y **Crear escenario nuevo** no llegaban a enlazar sus handlers.
+La V2.7 añade dos bloques grandes de funcionalidad:
 
-V2.5 deja de usar ese módulo roto. `boot-v24.js` sólo redirige al bootstrap V2.5 y la UI real vive en `ui-v25.js`, que se validó con `node --check` antes de publicarse.
+### Plan
+
+- Content Rail siempre visible.
+- Añadir por tap o drag.
+- Mover entre días.
+- Subir/bajar una pieza.
+- **Undo / Redo** reales.
+- Atajos `Cmd/Ctrl+Z`, `Shift+Cmd/Ctrl+Z`, `Cmd/Ctrl+Y`.
+- **Borrar todo el plan** con confirmación.
+- Después de borrar todo, Undo restaura inmediatamente el plan anterior.
+- Duplicar escenario.
+- Autosave local-first.
+
+### Feeds
+
+Selector de dispositivo:
+
+- **Mobile**
+- **Desktop**
+
+Modos por plataforma:
+
+- Instagram: **Grid / Feed / Reels**
+- TikTok: **Grid / Feed vertical**
+- LinkedIn: **Grid / Feed**
+- YouTube: **Grid / Videos / Player**
+- Facebook: **Grid / Feed**
+
+La vista Desktop usa un mockup ancho con browser chrome y grillas más grandes. La vista Mobile conserva el mockup de teléfono. El escenario es el mismo: cambiar de dispositivo o modo no duplica los datos.
 
 ## Local-first
 
-La app debe funcionar aunque Supabase no esté disponible. El orden es:
+La app no necesita Supabase para abrir, crear escenarios, editar el plan, usar Undo/Redo o revisar los feeds.
 
-1. cargar store local;
+Orden de funcionamiento:
+
+1. cargar estado local;
 2. montar UI;
-3. enlazar botones;
-4. permitir abrir/crear escenarios;
-5. iniciar Supabase en segundo plano.
+3. enlazar controles;
+4. guardar localmente cada cambio;
+5. intentar sincronizar Supabase después.
 
 Contratos preservados:
-- `jocEditorialV9`
+
 - `jocEditorialV9AppData`
 - `jocEditorialV9Scenarios`
-- `jocEditorialV9Cloud`
+- `editorialEmulatorV2CurrentScenario`
+- `editorialEmulatorV2Draft`
 - tabla `public.editorial_state`
 - `workspace_key = editorial-os`
 - payload compatible `version: 9`
@@ -30,67 +61,25 @@ Contratos preservados:
 ## Escenarios
 
 En la landing puedes:
+
 - continuar el último escenario;
 - abrir uno existente;
 - crear uno nuevo;
 - partir de Base JOC;
 - empezar una semana vacía;
-- duplicar un escenario existente.
-
-Los escenarios se guardan localmente inmediatamente y la nube sincroniza después.
-
-## UI V2.5
-
-La capa `system-v25.css` reorganiza la aplicación sobre una arquitectura visual más profesional:
-- desktop: navegación lateral compacta + workspace amplio;
-- tablet/móvil: workspace de una columna + bottom navigation;
-- Content Rail siempre visible y sticky;
-- drag & drop con feedback de drop target;
-- cards más legibles y jerarquía consistente;
-- sheets más claras;
-- responsive real con safe areas y `100dvh`;
-- inputs de 16 px y controles táctiles de 44 px;
-- inspector de feed sticky en desktop;
-- feeds con scroll contenido y `content-visibility` en listas largas;
-- reduced motion.
-
-## Content Rail
-
-La bandeja permite:
-- buscar;
-- filtrar L1/L2/L3;
-- expandir;
-- crear contenido;
-- arrastrar desde catálogo a un día;
-- reordenar entre días;
-- tocar una ficha como fallback si drag no está disponible.
-
-## Feeds persistentes
-
-Instagram, TikTok, LinkedIn, YouTube y Facebook permanecen montados. Cambiar de plataforma no destruye los shells. Los controllers sincronizan por `occurrenceId`, Play activa nodos existentes y TikTok usa scroll-snap/IntersectionObserver para mantener la publicación activa.
-
-## Rendimiento
-
-- store por canales (`planner`, `feeds`, `catalog`, `library`, `cloud`, `scenario`);
-- feeds cacheados por `dataRevision`;
-- controllers persistentes;
-- keyed DOM patching;
-- Supabase lazy-loaded;
-- sincronización cloud con debounce;
-- Service Worker `editorial-emulator-v2-5`;
-- HTML/CSS/JS en network-first;
-- caches `editorial-emulator-*` anteriores se eliminan al activar V2.5.
+- duplicar un escenario.
 
 ## PWA
 
-- `display: standalone`;
-- safe areas;
-- scope separado `./`;
-- `start_url: ./?v=25`;
+- Service Worker `editorial-emulator-v2-7`.
+- HTML/CSS/JS en network-first.
+- caches anteriores `editorial-emulator-*` se eliminan al activar la build nueva.
+- `display: standalone`.
+- safe areas.
 - fallback offline desde cache.
 
 ## URL
 
 - Repo: `https://github.com/LordJeferies/editorial-emulator`
-- Page: `https://lordjeferies.github.io/editorial-emulator/?v=25`
-- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html?v=25`
+- Page: `https://lordjeferies.github.io/editorial-emulator/?v=27`
+- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html?v=27`
