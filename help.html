@@ -4,91 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0a0b0e">
-  <title>Cómo usar Editorial Emulator V2.4</title>
-  <link rel="stylesheet" href="./css/app.css?v=24">
-  <link rel="stylesheet" href="./css/onboarding-v23.css?v=24">
-  <link rel="stylesheet" href="./css/system-v24.css?v=24">
+  <title>Cómo usar Editorial Emulator V2.5</title>
+  <link rel="stylesheet" href="./css/app.css?v=25">
+  <link rel="stylesheet" href="./css/onboarding-v23.css?v=25">
+  <link rel="stylesheet" href="./css/system-v24.css?v=25">
+  <link rel="stylesheet" href="./css/system-v25.css?v=25">
 </head>
 <body>
-<main class="guide-page">
-  <div class="guide-shell">
-    <div class="guide-top">
-      <div><div class="eyebrow">Editorial Emulator V2.4 · Guía</div><b>Cómo usar la app</b></div>
-      <a class="secondary-btn" href="./?v=24">← Volver al Emulador</a>
-    </div>
-
-    <section class="guide-hero">
-      <div class="eyebrow">De escenario a simulación</div>
-      <h1>Planifica la semana y comprueba cómo se verá antes de publicar.</h1>
-      <p>Editorial Emulator sirve para probar una estrategia editorial sin tocar el calendario real. Elige o crea un escenario, organiza contenidos por día, pulsa Play y revisa Instagram, TikTok, LinkedIn, YouTube y Facebook con el mismo plan.</p>
-      <div class="guide-steps">
-        <article class="guide-step"><div class="n">1</div><h3>Escenario</h3><p>Continúa uno guardado, abre otro o crea una semana nueva.</p></article>
-        <article class="guide-step"><div class="n">2</div><h3>Plan</h3><p>Arrastra una ficha a un día. En touch también puedes tocarla para añadirla al día activo.</p></article>
-        <article class="guide-step"><div class="n">3</div><h3>Play</h3><p>Recorre las publicaciones en orden sin reconstruir los visores.</p></article>
-        <article class="guide-step"><div class="n">4</div><h3>Feeds</h3><p>Comprueba cada plataforma y vuelve a ajustar el plan cuando haga falta.</p></article>
-      </div>
-    </section>
-
-    <section class="guide-section">
-      <div class="eyebrow">Empieza según tu situación</div>
-      <h2>¿Qué quieres hacer?</h2>
-      <div class="scenario-grid">
-        <article class="scenario-card"><div class="eyebrow">Ya estabas trabajando</div><h3>Continuar el último escenario</h3><p>Usa la tarjeta “Continuar donde estabas”. Recupera el mismo escenario y sigue desde el último estado guardado.</p><ul><li>No crea una copia.</li><li>Mantiene marca, fechas y piezas.</li><li>Autosave sigue activo.</li></ul></article>
-        <article class="scenario-card"><div class="eyebrow">Quieres revisar algo anterior</div><h3>Usar escenario existente</h3><p>Abre la lista de escenarios y selecciona el que quieras simular.</p><ul><li>Útil para comparar semanas.</li><li>Puedes duplicarlo antes de modificarlo.</li><li>El original permanece disponible.</li></ul></article>
-        <article class="scenario-card"><div class="eyebrow">Semana nueva</div><h3>Crear escenario nuevo</h3><p>Define nombre, marca y fecha de inicio. Luego elige la base del plan.</p><ul><li><b>Base JOC:</b> estructura recurrente.</li><li><b>Semana vacía:</b> planificación desde cero.</li><li><b>Duplicar:</b> variante de un escenario existente.</li></ul></article>
-      </div>
-    </section>
-
-    <section class="guide-section">
-      <div class="eyebrow">Flujo recomendado</div>
-      <h2>Paso a paso</h2>
-      <div class="workflow">
-        <div class="workflow-row"><strong>01</strong><div><b>Elige o crea el escenario</b><p>El escenario es la unidad persistente de trabajo: guarda marca, semana y distribución.</p></div></div>
-        <div class="workflow-row"><strong>02</strong><div><b>Usa la bandeja Contenidos</b><p>Busca por título o filtra L1/L2/L3. Arrastra una ficha al día que corresponda. En móvil, tocar una ficha la añade al día activo.</p></div></div>
-        <div class="workflow-row"><strong>03</strong><div><b>Ordena la semana</b><p>Reordena dentro del día, arrastra entre días o usa el menú ••• como fallback táctil.</p></div></div>
-        <div class="workflow-row"><strong>04</strong><div><b>Pulsa Play</b><p>Play avanza por las ocurrencias del escenario y mueve el foco al post ya montado en su plataforma.</p></div></div>
-        <div class="workflow-row"><strong>05</strong><div><b>Abre Feeds</b><p>Cambia entre Instagram, TikTok, LinkedIn, YouTube y Facebook. Los visores permanecen montados para conservar estado y scroll.</p></div></div>
-        <div class="workflow-row"><strong>06</strong><div><b>Revisa la publicación activa</b><p>El inspector muestra fecha, plataforma, nivel, pilar y familia de la publicación que estás viendo.</p></div></div>
-        <div class="workflow-row"><strong>07</strong><div><b>Ajusta y repite</b><p>Si la distribución no funciona, vuelve a Plan, mueve las piezas y revisa otra vez.</p></div></div>
-        <div class="workflow-row"><strong>08</strong><div><b>Duplica para comparar</b><p>Usa “Duplicar” para probar una alternativa sin destruir la versión anterior.</p></div></div>
-      </div>
-    </section>
-
-    <section class="guide-section">
-      <div class="eyebrow">Guardado y Supabase</div>
-      <h2>La nube no bloquea la aplicación</h2>
-      <div class="scenario-grid">
-        <article class="scenario-card"><h3>Local primero</h3><p>Cada cambio del escenario se guarda inmediatamente en el navegador. Crear, mover, editar y simular no espera a una respuesta de red.</p></article>
-        <article class="scenario-card"><h3>Supabase ya está configurado</h3><p>El repo usa el mismo proyecto y el mismo workspace <code>editorial-os</code>. Si existe una sesión válida del mismo origen, el Emulador la reutiliza y sincroniza en segundo plano.</p></article>
-        <article class="scenario-card"><h3>Sin conexión</h3><p>Si la nube no está disponible, puedes seguir trabajando. El indicador de la barra muestra Local/Offline/Pendiente/Sincronizado para que sepas el estado.</p></article>
-      </div>
-    </section>
-
-    <section class="guide-section">
-      <div class="eyebrow">Casos frecuentes</div>
-      <h2>Cómo pensar los escenarios</h2>
-      <div class="scenario-grid">
-        <article class="scenario-card"><h3>Plan semanal normal</h3><p>Parte de Base JOC, reemplaza las piezas necesarias y comprueba el equilibrio L1/L2/L3 antes de Play.</p></article>
-        <article class="scenario-card"><h3>Campaña o lanzamiento</h3><p>Duplica una semana existente y cambia sólo las piezas de campaña para comparar la estructura original y la propuesta.</p></article>
-        <article class="scenario-card"><h3>Prueba de plataforma</h3><p>Crea una semana vacía, añade contenidos de una sola red y usa Feeds para estudiar cómo se acumulan visualmente.</p></article>
-      </div>
-    </section>
-
-    <section class="guide-section">
-      <div class="eyebrow">Atajos</div>
-      <h2>Desktop</h2>
-      <div class="workflow">
-        <div class="workflow-row"><strong>⌘K</strong><div><b>Buscar y añadir contenido</b><p>También funciona con Ctrl+K.</p></div></div>
-        <div class="workflow-row"><strong>⌘N</strong><div><b>Crear</b><p>Desde Inicio crea un escenario; dentro de un escenario crea contenido. También funciona con Ctrl+N.</p></div></div>
-        <div class="workflow-row"><strong>ESC</strong><div><b>Cerrar</b><p>Cierra sheets y visores expandidos.</p></div></div>
-      </div>
-    </section>
-
-    <div class="guide-footer">
-      <span>El trabajo se guarda localmente al instante; Supabase es una capa de sincronización compartida con Editorial OS.</span>
-      <a class="primary-btn" href="./?v=24">Abrir Editorial Emulator</a>
-    </div>
-  </div>
-</main>
+<main class="guide-page"><div class="guide-shell">
+  <div class="guide-top"><div><div class="eyebrow">Editorial Emulator V2.5 · Guía</div><b>Cómo usar la app</b></div><a class="secondary-btn" href="./?v=25">← Volver al Emulador</a></div>
+  <section class="guide-hero"><div class="eyebrow">De escenario a simulación</div><h1>Planifica la semana y comprueba cómo se verá antes de publicar.</h1><p>Editorial Emulator funciona localmente primero. Elige o crea un escenario, organiza contenidos por día, pulsa Play y revisa Instagram, TikTok, LinkedIn, YouTube y Facebook. Supabase sincroniza después y no bloquea la interfaz.</p><div class="guide-steps"><article class="guide-step"><div class="n">1</div><h3>Escenario</h3><p>Continúa uno guardado, abre otro o crea una semana nueva.</p></article><article class="guide-step"><div class="n">2</div><h3>Plan</h3><p>Arrastra una ficha a un día. En touch también puedes tocarla.</p></article><article class="guide-step"><div class="n">3</div><h3>Play</h3><p>Recorre las publicaciones sin reconstruir los feeds.</p></article><article class="guide-step"><div class="n">4</div><h3>Feeds</h3><p>Comprueba cada plataforma y vuelve a ajustar.</p></article></div></section>
+  <section class="guide-section"><div class="eyebrow">Empieza según tu situación</div><h2>¿Qué quieres hacer?</h2><div class="scenario-grid"><article class="scenario-card"><div class="eyebrow">Ya estabas trabajando</div><h3>Continuar el último escenario</h3><p>Usa la tarjeta “Continuar donde estabas”. Recupera el mismo escenario y sigue desde el último estado guardado.</p></article><article class="scenario-card"><div class="eyebrow">Quieres revisar algo anterior</div><h3>Usar escenario existente</h3><p>Abre el selector visual, revisa nombre, rango y número de piezas y entra en el escenario elegido.</p></article><article class="scenario-card"><div class="eyebrow">Semana nueva</div><h3>Crear escenario nuevo</h3><p>Define nombre, marca y fecha. Puedes usar Base JOC, empezar vacío o duplicar otro escenario.</p></article></div></section>
+  <section class="guide-section"><div class="eyebrow">Flujo recomendado</div><h2>Paso a paso</h2><div class="workflow"><div class="workflow-row"><strong>01</strong><div><b>Elige o crea el escenario</b><p>El escenario guarda marca, semana y distribución.</p></div></div><div class="workflow-row"><strong>02</strong><div><b>Usa la bandeja Contenidos</b><p>Busca, filtra L1/L2/L3, arrastra al día o toca en móvil.</p></div></div><div class="workflow-row"><strong>03</strong><div><b>Ordena la semana</b><p>Reordena dentro del día o mueve entre días.</p></div></div><div class="workflow-row"><strong>04</strong><div><b>Pulsa Play</b><p>Play cambia la publicación activa y desplaza el feed persistente correspondiente.</p></div></div><div class="workflow-row"><strong>05</strong><div><b>Abre Feeds</b><p>Instagram, TikTok, LinkedIn, YouTube y Facebook permanecen montados para conservar estado y scroll.</p></div></div><div class="workflow-row"><strong>06</strong><div><b>Itera</b><p>Vuelve a Plan, mueve piezas y revisa otra vez sin perder el escenario.</p></div></div></div></section>
+  <section class="guide-section"><div class="eyebrow">Guardado y nube</div><h2>Supabase no bloquea la aplicación</h2><div class="scenario-grid"><article class="scenario-card"><h3>Local primero</h3><p>Crear, mover, editar y simular se guarda primero en el navegador.</p></article><article class="scenario-card"><h3>Mismo Supabase</h3><p>El proyecto y workspace <code>editorial-os</code> siguen compartidos con Editorial OS.</p></article><article class="scenario-card"><h3>Sin conexión</h3><p>Puedes seguir trabajando. El estado Local/Offline/Pendiente/Sincronizado indica qué está pasando.</p></article></div></section>
+  <section class="guide-section"><div class="eyebrow">Casos frecuentes</div><h2>Cómo pensar los escenarios</h2><div class="scenario-grid"><article class="scenario-card"><h3>Plan semanal normal</h3><p>Parte de Base JOC y sustituye sólo las piezas necesarias.</p></article><article class="scenario-card"><h3>Campaña o lanzamiento</h3><p>Duplica una semana y crea una variante A/B sin destruir la anterior.</p></article><article class="scenario-card"><h3>Prueba de plataforma</h3><p>Empieza vacío, añade una sola red y estudia el feed resultante.</p></article></div></section>
+  <div class="guide-footer"><span>V2.5 funciona localmente primero; la nube sincroniza en segundo plano.</span><a class="primary-btn" href="./?v=25">Abrir Editorial Emulator</a></div>
+</div></main>
 </body>
 </html>
