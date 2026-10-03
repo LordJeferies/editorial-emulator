@@ -1,0 +1,9 @@
+/* Editorial Emulator V2.9 · desktop distribution additions */
+.startup-actions{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.desktop-download{background:linear-gradient(180deg,#f7d26b,#f0b92f);color:#171208;border-color:transparent;text-decoration:none;display:inline-grid;place-items:center;text-align:center}
+.desktop-download:hover{filter:brightness(1.04)}
+.desktop-download:active{transform:translateY(1px)}
+.desktop-download-note{margin-top:12px;padding:12px 14px;border:1px solid var(--border-subtle,var(--line));border-radius:var(--radius-lg,16px);background:var(--surface-raised,var(--surface));color:var(--text-secondary,var(--muted));font-size:12px;line-height:1.45}
+.desktop-download-note b{color:var(--text-primary,var(--text))}
+.desktop-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-default,var(--line));border-radius:999px;padding:5px 8px;margin-left:6px;color:var(--text-secondary,var(--muted));font-size:10px;font-weight:700;vertical-align:middle}
+@media(max-width:760px){.startup-actions{grid-template-columns:1fr}.desktop-download-note{font-size:11px}}
