@@ -1,4 +1,5 @@
 const BUILD='2.3';
+const BUILD_KEY='editorialEmulatorBootBuild';
 const APP_ASSETS=[
   './js/ui.js','./js/store.js','./js/defaults.js','./js/cloud.js','./js/feeds.js','./js/controllers.js','./css/app.css'
 ];
@@ -28,7 +29,7 @@ async function refreshServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const registration=await navigator.serviceWorker.register('./sw.js?v=23',{updateViaCache:'none'});
-    await registration.update();
+    registration.update().catch(()=>{});
   }catch(error){
     console.info('Service Worker no disponible; la app seguirá online.',error);
   }
@@ -40,11 +41,18 @@ async function warmFreshModules(){
   }));
 }
 
+async function migrateMixedCachesOnce(){
+  let current='';
+  try{current=localStorage.getItem(BUILD_KEY)||''}catch{}
+  if(current===BUILD)return;
+  await clearOldAppCaches();
+  await warmFreshModules();
+  try{localStorage.setItem(BUILD_KEY,BUILD)}catch{}
+}
+
 async function boot(){
   document.documentElement.dataset.emulatorBuild=BUILD;
-  await clearOldAppCaches();
-  await refreshServiceWorker();
-  await warmFreshModules();
+  await migrateMixedCachesOnce();
   const [{initUI},{cloud}]=await Promise.all([
     import('./ui.js?v=23'),
     import('./cloud.js?v=23')
@@ -53,6 +61,7 @@ async function boot(){
   initUI();
   window.__editorialEmulatorBooted=true;
   window.dispatchEvent(new CustomEvent('editorial-emulator:ready',{detail:{build:BUILD}}));
+  refreshServiceWorker();
 }
 
 boot().catch(showBootError);
