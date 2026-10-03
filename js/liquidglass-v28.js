@@ -1,0 +1,10 @@
+/* V2.8 progressive LiquidGlass. Intentionally limited to the lightweight startup
+   surface: heavy planner/feed DOM stays outside WebGL capture roots. */
+let instance=null,loading=false;
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const reduceTransparency=matchMedia('(prefers-reduced-transparency: reduce)');
+async function destroy(){if(instance){try{await instance.destroy?.()}catch{}instance=null}document.documentElement.classList.remove('liquidglass-live')}
+async function enable(){const root=document.getElementById('startup'),glass=root?.querySelector(':scope > .startup-shell');if(!root||!glass||root.hidden||instance||loading||reduceMotion.matches||reduceTransparency.matches)return;loading=true;try{const mod=await import('https://cdn.jsdelivr.net/npm/@ybouane/liquidglass/dist/index.js');glass.dataset.config=JSON.stringify({blurAmount:.14,refraction:.28,chromAberration:.0025,edgeHighlight:.08,specular:.08,fresnel:.50,distortion:.002,cornerRadius:22,zRadius:14,opacity:.92,saturation:.05,shadowOpacity:.10,shadowSpread:8,shadowOffsetY:2,floating:false,button:false});instance=await mod.LiquidGlass.init({root,glassElements:[glass],defaults:JSON.parse(glass.dataset.config)});document.documentElement.classList.add('liquidglass-live')}catch(e){console.info('LiquidGlass V2.8: fallback CSS activo.',e)}finally{loading=false}}
+function sync(){const root=document.getElementById('startup');if(root?.hidden)destroy();else enable()}
+function boot(){sync();const root=document.getElementById('startup');if(root)new MutationObserver(sync).observe(root,{attributes:true,attributeFilter:['hidden','style','class']});reduceMotion.addEventListener?.('change',()=>{destroy();sync()});reduceTransparency.addEventListener?.('change',()=>{destroy();sync()})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
