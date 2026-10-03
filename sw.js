@@ -1,5 +1,5 @@
-const CACHE='editorial-emulator-v2-6';
-const CORE=['./','./index.html','./help.html','./css/system-v26.css','./js/runtime-v26.js','./manifest.webmanifest','./icons/icon.svg','./supabase-config.js'];
+const CACHE='editorial-emulator-v2-7';
+const CORE=['./','./index.html','./help.html','./css/system-v27.css','./js/runtime-v27.js','./manifest.webmanifest','./icons/icon.svg','./supabase-config.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('editorial-emulator-')&&k!==CACHE)await caches.delete(k);await self.clients.claim()})()));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==location.origin)return;const code=e.request.mode==='navigate'||/\.(html|css|js|webmanifest)$/.test(u.pathname)||u.pathname.endsWith('/');e.respondWith(code?networkFirst(e.request):cacheFirst(e.request))});
