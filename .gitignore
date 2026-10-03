@@ -1,0 +1,10 @@
+# Node / MCP
+mcp/node_modules/
+mcp/.env
+mcp/.env.local
+
+# macOS
+.DS_Store
+
+# Local build output
+dist/
