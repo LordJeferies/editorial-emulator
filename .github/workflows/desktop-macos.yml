@@ -1,0 +1,37 @@
+name: Desktop macOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/mac/**'
+      - 'icons/icon.svg'
+      - '.github/workflows/desktop-macos.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build desktop app
+        run: |
+          chmod +x desktop/mac/build.sh
+          ./desktop/mac/build.sh
+      - name: Publish stable desktop asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view desktop-latest >/dev/null 2>&1; then
+            gh release upload desktop-latest dist/Editorial-Emulator-macOS.zip --clobber
+            gh release edit desktop-latest \
+              --title "Editorial Emulator Desktop" \
+              --notes "Desktop macOS wrapper para la app canónica de GitHub Pages. La interfaz y los datos se actualizan desde https://lordjeferies.github.io/editorial-emulator/."
+          else
+            gh release create desktop-latest dist/Editorial-Emulator-macOS.zip \
+              --title "Editorial Emulator Desktop" \
+              --notes "Desktop macOS wrapper para la app canónica de GitHub Pages. La interfaz y los datos se actualizan desde https://lordjeferies.github.io/editorial-emulator/."
+          fi
