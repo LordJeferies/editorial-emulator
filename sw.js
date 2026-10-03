@@ -1,33 +1,20 @@
-const CACHE='editorial-emulator-v2-2';
+const CACHE='editorial-emulator-v2-3';
 const CORE=[
-  './','./index.html','./css/app.css','./js/app.js','./js/ui.js','./js/store.js',
-  './js/defaults.js','./js/cloud.js','./js/feeds.js','./js/controllers.js',
+  './','./index.html','./help.html',
+  './css/app.css','./css/onboarding-v23.css',
+  './js/boot-v23.js','./js/app.js','./js/ui.js','./js/store.js','./js/defaults.js','./js/cloud.js','./js/feeds.js','./js/controllers.js',
   './manifest.webmanifest','./icons/icon.svg','./supabase-config.js'
 ];
 
 self.addEventListener('install',event=>{
-  event.waitUntil(
-    caches.open(CACHE)
-      .then(cache=>cache.addAll(CORE))
-      .then(()=>self.skipWaiting())
-  );
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
 
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{
     const keys=await caches.keys();
-    await Promise.all(keys
-      .filter(key=>key.startsWith('editorial-emulator-')&&key!==CACHE)
-      .map(key=>caches.delete(key)));
+    await Promise.all(keys.filter(key=>key.startsWith('editorial-emulator-')&&key!==CACHE).map(key=>caches.delete(key)));
     await self.clients.claim();
-    // V2.2 fixes a real failure mode from V1/V2: an installed PWA could keep
-    // running old cached JS/CSS even though main had already been updated.
-    // Navigate every open window once when this new worker activates so the
-    // user is guaranteed to land on the current GitHub Pages build.
-    const clients=await self.clients.matchAll({type:'window',includeUncontrolled:true});
-    await Promise.all(clients.map(client=>{
-      try{return client.navigate(client.url)}catch{return Promise.resolve()}
-    }));
   })());
 });
 
@@ -60,10 +47,6 @@ self.addEventListener('fetch',event=>{
   if(request.method!=='GET')return;
   const url=new URL(request.url);
   if(url.origin!==location.origin)return;
-
-  const isAppCode = request.mode==='navigate' ||
-    /\.(?:html|css|js|webmanifest)$/.test(url.pathname) ||
-    url.pathname.endsWith('/');
-
+  const isAppCode=request.mode==='navigate'||/\.(?:html|css|js|webmanifest)$/.test(url.pathname)||url.pathname.endsWith('/');
   event.respondWith(isAppCode?networkFirst(request):cacheFirst(request));
 });
