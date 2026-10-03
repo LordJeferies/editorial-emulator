@@ -1,0 +1,17 @@
+{
+  "name": "editorial-emulator-mcp",
+  "version": "3.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server for Editorial Emulator / Editorial OS shared Supabase workspace",
+  "engines": {"node": ">=20"},
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node --check server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "@supabase/supabase-js": "^2.57.4",
+    "zod": "^3.25.76"
+  }
+}
