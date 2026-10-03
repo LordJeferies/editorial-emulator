@@ -21,7 +21,7 @@ async function boot(){
   registerSW();
   const [{initUI},{cloud}]=await Promise.all([
     import('./ui-v24.js?v=24'),
-    import('./cloud.js?v=24')
+    import('./cloud.js')
   ]);
   initUI();
   window.__editorialEmulatorBooted=true;
