@@ -1,4 +1,4 @@
-const CACHE='editorial-emulator-v3-2-mcp-progress';
+const CACHE='editorial-emulator-v3-2-mcp-guide';
 const CORE=['./','./index.html','./help.html','./product.html','./mcp.html','./css/system-v27.css','./css/system-v28.css','./css/system-v29.css','./css/system-v30.css','./css/system-v31.css','./css/system-v32.css','./js/runtime-v27.js','./js/ux-v28.js','./js/liquidglass-v28.js','./js/cloud-bridge-v29.js','./js/bootstrap-v32.js','./js/planner-v30.js','./js/mcp-ui-v31.js','./js/progress-v32.js','./js/activity-v32.js','./manifest.webmanifest','./icons/icon.svg','./supabase-config.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('editorial-emulator-')&&k!==CACHE)await caches.delete(k);await self.clients.claim()})()));
