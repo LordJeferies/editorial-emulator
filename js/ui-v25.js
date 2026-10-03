@@ -1,0 +1,157 @@
+import {store} from './store.js';
+import {PLATFORMS} from './defaults.js';
+import {feeds} from './feeds.js';
+import {FeedControllerHub} from './controllers.js';
+
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const DOWS=[1,2,3,4,5,6,0];
+const DN={1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado',0:'Domingo'};
+const DS={1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb',0:'Dom'};
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+let hub;
+let simTimer=null;
+let sheetReturn=null;
+let sortables=[];
+let cloudModule=null;
+
+async function getCloud(){
+  if(cloudModule)return cloudModule;
+  try{cloudModule=(await import('./cloud.js?v=25')).cloud;return cloudModule}catch(error){console.info('Cloud opcional no disponible',error);return null}
+}
+function toast(text,type='info'){
+  const region=$('#toastRegion');if(!region)return;
+  const node=document.createElement('div');node.className=`toast toast-${type}`;node.textContent=text;region.append(node);setTimeout(()=>node.remove(),2600)
+}
+function setBusy(button,busy,label='Procesando…'){
+  if(!button)return;
+  if(busy){button.dataset.label=button.textContent;button.disabled=true;button.textContent=label;button.setAttribute('aria-busy','true')}
+  else{button.disabled=false;button.textContent=button.dataset.label||button.textContent;button.removeAttribute('aria-busy')}
+}
+function weekStart(){const d=new Date(`${store.state.ui.anchorDate}T12:00:00`),diff=(d.getDay()+6)%7;d.setDate(d.getDate()-diff);return d}
+function dateForDow(dow){const s=weekStart(),d=new Date(s);d.setDate(s.getDate()+DOWS.indexOf(dow));return d}
+function weekLabel(){const s=weekStart(),e=new Date(s);e.setDate(s.getDate()+6);return `${s.getDate()} ${s.toLocaleDateString('es-ES',{month:'short'})} – ${e.getDate()} ${e.toLocaleDateString('es-ES',{month:'short',year:'numeric'})}`}
+
+function openSheet({eyebrow='Acción',title='Detalle',body='',footer='',onOpen}={}){
+  sheetReturn=document.activeElement;
+  $('#sheetEyebrow').textContent=eyebrow;$('#sheetTitle').textContent=title;$('#sheetBody').innerHTML=body;$('#sheetFooter').innerHTML=footer;
+  $('#sheetBackdrop').hidden=false;$('#sheet').hidden=false;document.body.classList.add('modal-open');
+  onOpen?.();setTimeout(()=>$('#sheet').querySelector('input,button,select,textarea')?.focus(),30)
+}
+function closeSheet(){if($('#sheet')?.hidden)return;$('#sheet').hidden=true;$('#sheetBackdrop').hidden=true;document.body.classList.remove('modal-open');sheetReturn?.focus?.();sheetReturn=null}
+
+function renderStartup(){
+  const recent=$('#recentScenario'),sc=store.state.savedScenarios[0];
+  if(recent)recent.innerHTML=sc?`<button class="scenario-choice" data-open-scenario="${esc(sc.id)}"><span class="eyebrow">Continuar donde estabas</span><b>${esc(sc.name)}</b><small>${esc(sc.range?.start||'')} → ${esc(sc.range?.end||'')} · ${Object.values(sc.slots||{}).flat().length} piezas</small></button>`:'';
+}
+function showStartup(){stopSimulation();$('#app').hidden=true;$('#startup').hidden=false;renderStartup()}
+function enterApp(){
+  if(!store.state.currentScenarioId)return;
+  $('#startup').hidden=true;$('#app').hidden=false;
+  renderScenarioHeader();renderBrands();renderPlanner();renderRail();renderLibrary();renderCloud();hub.syncAll();renderPlatforms();
+}
+function renderScenarioHeader(){
+  const sc=store.currentScenario();$('#scenarioNameHeading').textContent=sc?.name||'Escenario';$('#weekLabel').textContent=weekLabel();
+  const pill=$('#autosavePill');if(pill){const saved=store.state.autosave.status==='saved';pill.textContent=saved?'✓ Guardado':'Guardando…';pill.className=`sync-pill ${saved?'synced':'syncing'}`}
+}
+function renderBrands(){const select=$('#brandSelect');if(select)select.innerHTML=store.state.appData.brands.filter(x=>!x.archived).map(b=>`<option value="${esc(b.id)}" ${b.id===store.state.appData.activeBrandId?'selected':''}>${esc(b.name)}</option>`).join('')}
+function card(item,dow){return `<article class="day-card" data-instance="${esc(item.instanceId)}" data-dow="${dow}" tabindex="0"><button class="card-menu" data-card-menu="${esc(item.instanceId)}" data-dow="${dow}" aria-label="Opciones">•••</button><span class="lot">${esc(item.lot||'L2')}</span><h4>${esc(item.title)}</h4><p>${esc(item.type||'Contenido')}<br>${(item.platforms||[]).map(feeds.name).join(' · ')}</p></article>`}
+function renderPlanner(){
+  renderScenarioHeader();const active=store.state.ui.selectedDow;
+  $('#dayTabs').innerHTML=DOWS.map(d=>`<button data-day="${d}" class="${d===active?'active':''}">${DS[d]}<br><small>${dateForDow(d).getDate()}</small></button>`).join('');
+  $('#weekBoard').innerHTML=DOWS.map(d=>{const items=store.state.plannerDraft[d]||[];return `<section class="day-column ${d===active?'active-mobile':''}" data-dow="${d}"><div class="day-head"><div><b>${DN[d]}</b><br><small>${dateForDow(d).toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}</small></div><span>${items.length}</span></div><div class="day-list" data-day-list="${d}">${items.length?items.map(x=>card(x,d)).join(''):'<div class="empty-day"><b>Sin contenido</b><span>Arrastra una ficha aquí o tócala en la bandeja.</span></div>'}</div></section>`}).join('');
+  setupSortables();
+}
+function renderRail(){
+  const q=($('#railSearch')?.value||'').trim().toLowerCase(),filter=store.state.ui.catalogFilter;
+  const items=store.allTemplates().filter(x=>filter==='all'||x.lot===filter).filter(x=>!q||[x.title,x.type,x.role,x.familyId,x.pillarId].join(' ').toLowerCase().includes(q));
+  $('#railFilters').innerHTML=['all','L1','L2','L3'].map(x=>`<button class="chip ${filter===x?'active':''}" data-rail-filter="${x}">${x==='all'?'Todos':x}</button>`).join('');
+  $('#contentRail').innerHTML=items.map(x=>`<article class="rail-card" data-template-id="${esc(x.id)}" tabindex="0"><span class="lot">${esc(x.lot)}</span><b>${esc(x.title)}</b><small>${esc(x.type)} · ${(x.platforms||[]).map(feeds.name).join(' · ')}</small></article>`).join('')||'<div class="rail-empty">No hay contenidos con este filtro.</div>';
+  setupSortables();
+}
+function destroySortables(){sortables.forEach(x=>{try{x.destroy()}catch{}});sortables=[]}
+function setupSortables(){
+  destroySortables();if(!window.Sortable)return;
+  const rail=$('#contentRail');
+  if(rail)sortables.push(new Sortable(rail,{group:{name:'editorial-v25',pull:'clone',put:false},sort:false,animation:150,delay:140,delayOnTouchOnly:true,touchStartThreshold:4,forceFallback:true,fallbackOnBody:true,ghostClass:'dragging',chosenClass:'drag-chosen'}));
+  $$('[data-day-list]').forEach(list=>sortables.push(new Sortable(list,{group:{name:'editorial-v25',pull:true,put:true},animation:160,delay:120,delayOnTouchOnly:true,touchStartThreshold:4,forceFallback:true,fallbackOnBody:true,ghostClass:'dragging',chosenClass:'drag-chosen',dragClass:'drag-active',onStart(){list.classList.add('drop-active')},onEnd(){list.classList.remove('drop-active')},onAdd(evt){const to=Number(evt.to.dataset.dayList),templateId=evt.item.dataset.templateId;if(templateId){evt.item.remove();store.addToDay(templateId,to);store.setUI({selectedDow:to});toast(`Añadido a ${DN[to]}`,'success');return}const id=evt.item.dataset.instance,from=Number(evt.from.dataset.dayList);if(id&&Number.isFinite(from)){const index=[...evt.to.querySelectorAll('.day-card')].indexOf(evt.item);store.moveToDay(from,id,to,index);toast(`Movido a ${DN[to]}`,'success')}},onUpdate(evt){const dow=Number(evt.to.dataset.dayList),ids=[...evt.to.querySelectorAll('.day-card')].map(x=>x.dataset.instance);store.reorderDay(dow,ids)}})));
+}
+function renderCloud(){const s=store.state.cloud.status,pill=$('#syncPill');if(!pill)return;const map={synced:['Sincronizado','synced'],syncing:['Sincronizando…','syncing'],pending:['Pendiente','pending'],remote:['Cambios remotos','warning'],error:['Offline','error'],local:['Local','local']};const [label,cls]=map[s]||map.local;pill.textContent=label;pill.className=`sync-pill ${cls}`}
+function renderPlatforms(){const p=store.state.ui.platform;$('#platformTabs').innerHTML=PLATFORMS.map(([id,name])=>`<button data-platform="${id}" class="${id===p?'active':''}">${name}</button>`).join('');$('#instagramControls').hidden=p!=='instagram';$$('#instagramMode button').forEach(b=>b.classList.toggle('active',b.dataset.mode===store.state.ui.instagramMode));hub.show(p);if(p==='instagram')hub.setInstagramMode(store.state.ui.instagramMode)}
+function renderFeedInspector(){const p=store.state.ui.platform,posts=feeds.get(p),active=feeds.find(store.state.ui.activeOccurrenceId);$('#feedWeekSummary').textContent=`${posts.length} publicaciones`;const counts={L1:0,L2:0,L3:0};posts.forEach(x=>counts[x.lot]=(counts[x.lot]||0)+1);$('#feedMetrics').innerHTML=Object.entries(counts).map(([k,v])=>`<div class="metric-row"><span>${k}</span><span>${v}</span></div>`).join('');$('#activePostTitle').textContent=active?.title||'Ninguna';$('#activePostMeta').innerHTML=active?`<div class="meta-row"><span>Fecha</span><span>${esc(active.date)}</span></div><div class="meta-row"><span>Plataforma</span><span>${esc(feeds.name(active.platform))}</span></div><div class="meta-row"><span>Nivel</span><span>${esc(active.lot||'')}</span></div><div class="meta-row"><span>Pilar</span><span>${esc(active.pillar||'—')}</span></div><div class="meta-row"><span>Familia</span><span>${esc(active.family||'—')}</span></div>`:'<p class="muted-copy">Pulsa Play o toca una publicación del visor.</p>'}
+function syncFeeds(){hub.syncAll();renderFeedInspector();const active=feeds.find(store.state.ui.activeOccurrenceId);if(active)hub.activate(active.occurrenceId,active.platform)}
+function navigate(view){store.setUI({view});$$('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===view));$$('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===view));$('#screenTitle').textContent=view==='plan'?'Plan':view==='feeds'?'Feeds':'Biblioteca';if(view==='feeds'){renderPlatforms();renderFeedInspector()}if(view==='library')renderLibrary()}
+function renderLibrary(){
+  const tab=store.state.ui.libraryTab,q=($('#librarySearch')?.value||'').trim().toLowerCase();$$('[data-library]').forEach(b=>b.classList.toggle('active',b.dataset.library===tab));let rows=[];
+  if(tab==='content')rows=store.allTemplates().map(x=>({title:x.title,desc:x.description||x.role||x.type,tags:[x.lot,x.type,...(x.platforms||[])]}));
+  if(tab==='pillars')rows=store.state.appData.pillars.filter(x=>!x.archived).map(x=>({title:x.name,desc:x.description,tags:['Pilar']}));
+  if(tab==='families')rows=store.state.appData.families.filter(x=>!x.archived).map(x=>({title:x.name,desc:x.description,tags:['Familia']}));
+  if(tab==='brands')rows=store.state.appData.brands.filter(x=>!x.archived).map(x=>({title:x.name,desc:(x.platforms||[]).map(feeds.name).join(' · '),tags:['Marca']}));
+  if(tab==='scenarios')rows=store.state.savedScenarios.map(x=>({title:x.name,desc:`${x.range?.start||''} → ${x.range?.end||''}`,tags:['Escenario',`${Object.values(x.slots||{}).flat().length} piezas`]}));
+  rows=rows.filter(x=>!q||[x.title,x.desc,...x.tags].join(' ').toLowerCase().includes(q));
+  $('#libraryList').innerHTML=rows.map(x=>`<article class="library-row"><span class="eyebrow">${esc(x.tags[0]||'')}</span><h4>${esc(x.title)}</h4><p>${esc(x.desc||'')}</p><div class="tag-row">${x.tags.slice(1).map(t=>`<span class="tag">${esc(feeds.name(t))}</span>`).join('')}</div></article>`).join('')||'<div class="empty-state"><b>No hay resultados</b><span>Prueba otro término o crea un elemento nuevo.</span></div>';
+}
+function renderSimulation(){const q=feeds.all();if(!q.length){$('#simulationStrip').hidden=true;return}const i=Math.max(0,Math.min(q.length-1,store.state.ui.simIndex)),p=q[i];$('#simulationStrip').hidden=!store.state.ui.simPlaying;$('#simCounter').textContent=`${i+1}/${q.length}`;$('#simTitle').textContent=p.title;$('#simMeta').textContent=`${p.date} · ${feeds.name(p.platform)}`;$('#simPause').textContent=store.state.ui.simPlaying?'Ⅱ':'▶';$('#playBtn').classList.toggle('playing',store.state.ui.simPlaying);$('#playBtn').innerHTML=store.state.ui.simPlaying?'<span>■</span> Stop':'<span>▶</span> Play'}
+function activateSimulation(index){const q=feeds.all();if(!q.length)return;const i=(index+q.length)%q.length,p=q[i];store.state.ui.simIndex=i;store.state.ui.activeOccurrenceId=p.occurrenceId;store.state.ui.platform=p.platform;store.state.ui.selectedDow=p.dow;hub.activate(p.occurrenceId,p.platform);renderPlatforms();renderFeedInspector();renderSimulation()}
+function startSimulation(){const q=feeds.all();if(!q.length){toast('Añade contenido al plan primero','warning');return}if(store.state.ui.simPlaying){stopSimulation();return}store.state.ui.simPlaying=true;activateSimulation(store.state.ui.simIndex||0);renderSimulation();simTimer=setInterval(()=>activateSimulation(store.state.ui.simIndex+1),2400)}
+function stopSimulation(){clearInterval(simTimer);simTimer=null;store.state.ui.simPlaying=false;renderSimulation()}
+
+function scenarioPicker(){
+  const scenarios=store.state.savedScenarios;
+  openSheet({eyebrow:'Escenarios',title:'Usar uno existente',body:scenarios.length?`<div class="scenario-grid">${scenarios.map(s=>`<button class="scenario-tile" data-open="${esc(s.id)}"><span class="eyebrow">${Object.values(s.slots||{}).flat().length} piezas</span><b>${esc(s.name)}</b><small>${esc(s.range?.start||'')} → ${esc(s.range?.end||'')}</small></button>`).join('')}</div>`:'<div class="empty-state"><b>Aún no hay escenarios</b><span>Crea uno nuevo; se guardará automáticamente.</span></div>',footer:'<button class="secondary-btn" data-close-sheet>Cerrar</button><button class="primary-btn" data-create-from-picker>＋ Crear nuevo</button>',onOpen(){
+    $('#sheetBody').onclick=e=>{const id=e.target.closest('[data-open]')?.dataset.open;if(id&&store.openScenario(id)){closeSheet();enterApp();toast('Escenario abierto','success')}};
+    $('#sheetFooter [data-create-from-picker]').onclick=()=>scenarioCreate();
+  }});
+}
+function scenarioCreate(){
+  const brands=store.state.appData.brands.filter(x=>!x.archived),sources=store.state.savedScenarios;
+  openSheet({eyebrow:'Nuevo escenario',title:'Crear una simulación',body:`<form id="scenarioForm" class="form-grid"><div class="field full"><label>Nombre</label><input name="name" required placeholder="Semana podcast + webinar"></div><div class="field"><label>Marca</label><select name="brandId">${brands.map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('')}</select></div><div class="field"><label>Desde</label><input name="start" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field full"><label>Partir de</label><select name="mode" id="scenarioMode"><option value="base">Base JOC</option><option value="empty">Semana vacía</option><option value="duplicate">Duplicar escenario existente</option></select></div><div class="field full" id="scenarioSourceField" hidden><label>Escenario origen</label><select name="sourceId">${sources.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')}</select></div></form>`,footer:'<button class="secondary-btn" data-close-sheet>Cancelar</button><button class="primary-btn" id="createScenarioSave">Crear escenario</button>',onOpen(){
+    $('#scenarioMode').onchange=e=>$('#scenarioSourceField').hidden=e.target.value!=='duplicate';
+    $('#createScenarioSave').onclick=()=>{const form=$('#scenarioForm');if(!form.reportValidity())return;const btn=$('#createScenarioSave');setBusy(btn,true,'Creando…');try{const data=Object.fromEntries(new FormData(form).entries());store.createScenario(data);closeSheet();enterApp();toast('Escenario creado y guardado','success')}catch(error){console.error(error);toast('No pudimos crear el escenario','error');setBusy(btn,false)}};
+  }});
+}
+function showCardMenu(dow,id){const item=store.state.plannerDraft[dow].find(x=>x.instanceId===id);if(!item)return;openSheet({eyebrow:item.lot,title:item.title,body:`<div class="sheet-actions"><button class="menu-action" data-action="move">Mover a otro día</button><button class="menu-action danger" data-action="remove">Quitar del plan</button></div>`,onOpen(){$('#sheetBody').onclick=e=>{const action=e.target.closest('[data-action]')?.dataset.action;if(action==='remove'){store.removeFromDay(dow,id);closeSheet();toast('Contenido eliminado','success')}if(action==='move')openMoveSheet(dow,id)}}})}
+function openMoveSheet(from,id){openSheet({eyebrow:'Mover',title:'Selecciona el día',body:`<div class="sheet-actions">${DOWS.map(d=>`<button class="menu-action" data-move="${d}">${DN[d]}${d===from?' · actual':''}</button>`).join('')}</div>`,onOpen(){$('#sheetBody').onclick=e=>{const d=e.target.closest('[data-move]')?.dataset.move;if(d===undefined)return;store.moveToDay(from,id,Number(d));store.state.ui.selectedDow=Number(d);closeSheet();toast(`Movido a ${DN[Number(d)]}`,'success')}}})}
+function contentCreate(){
+  const pOpts=store.state.appData.pillars.filter(x=>!x.archived).map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join(''),fOpts=store.state.appData.families.filter(x=>!x.archived).map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+  openSheet({eyebrow:'Crear',title:'Nuevo contenido',body:`<form id="contentForm" class="form-grid"><div class="field full"><label>Título</label><input name="title" required placeholder="Ej. Clip podcast · criterio de decisión"></div><div class="field"><label>Tipo</label><input name="type" placeholder="Reel, carrusel, nota…"></div><div class="field"><label>Nivel</label><select name="lot"><option>L1</option><option selected>L2</option><option>L3</option></select></div><div class="field"><label>Pilar</label><select name="pillarId"><option value="">Sin pilar</option>${pOpts}</select></div><div class="field"><label>Familia</label><select name="familyId"><option value="">Sin familia</option>${fOpts}</select></div><div class="field full"><label>Plataformas</label><div class="platform-checks">${PLATFORMS.map(([id,name])=>`<label><input type="checkbox" name="platform" value="${id}" ${id==='instagram'?'checked':''}> ${name}</label>`).join('')}</div></div><details class="field full"><summary>Opciones avanzadas</summary><div class="form-grid advanced-grid"><div class="field"><label>Superficie</label><input name="surface"></div><div class="field"><label>Rol</label><input name="role"></div><div class="field full"><label>Caption</label><textarea name="caption" rows="3"></textarea></div></div></details></form>`,footer:'<button class="secondary-btn" data-close-sheet>Cancelar</button><button class="primary-btn" id="saveContent">Crear contenido</button>',onOpen(){
+    $('#saveContent').onclick=()=>{const form=$('#contentForm');if(!form.reportValidity())return;const fd=new FormData(form),item=store.createContent({title:fd.get('title'),type:fd.get('type'),lot:fd.get('lot'),pillarId:fd.get('pillarId'),familyId:fd.get('familyId'),platforms:fd.getAll('platform'),surface:fd.get('surface'),role:fd.get('role'),caption:fd.get('caption')});closeSheet();toast(`Creado: ${item.title}`,'success')};
+  }});
+}
+function simpleCreate(kind){if(kind==='content'){contentCreate();return}if(kind==='scenarios'){scenarioCreate();return}const label=kind==='pillars'?'Pilar':kind==='families'?'Familia':'Marca';let body=`<form id="simpleForm" class="form-grid"><div class="field full"><label>Nombre</label><input name="name" required></div>`;if(kind==='families')body+=`<div class="field full"><label>Pilar</label><select name="pillarId">${store.state.appData.pillars.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}</select></div>`;if(kind!=='brands')body+='<div class="field full"><label>Descripción opcional</label><textarea name="description" rows="3"></textarea></div>';if(kind==='brands')body+='<div class="field full"><label>Color</label><input type="color" name="color" value="#6d5dfc"></div>';body+='</form>';openSheet({eyebrow:'Crear',title:`Nuevo ${label.toLowerCase()}`,body,footer:'<button class="secondary-btn" data-close-sheet>Cancelar</button><button class="primary-btn" id="simpleSave">Crear</button>',onOpen(){$('#simpleSave').onclick=()=>{const form=$('#simpleForm');if(!form.reportValidity())return;const data=Object.fromEntries(new FormData(form).entries());if(kind==='pillars')store.createPillar(data);if(kind==='families')store.createFamily(data);if(kind==='brands')store.createBrand({...data,platforms:PLATFORMS.map(x=>x[0])});closeSheet();renderLibrary();toast(`${label} creado`,'success')}}})}
+async function cloudSheet(){const cloud=await getCloud();if(!cloud){toast('La nube no está disponible; el trabajo local sigue funcionando.','warning');return}const session=store.state.cloud.session;openSheet({eyebrow:'Supabase',title:'Sincronización',body:`<div class="sync-explainer"><b>Local-first.</b><p>La app guarda primero en este dispositivo y Supabase sincroniza después.</p></div>${session?`<div class="library-row"><h4>${esc(session.user.email)}</h4><p>Sesión activa.</p></div>`:'<p class="muted-copy">No necesitas iniciar sesión para usar la app.</p>'}<div class="sheet-actions"><button class="menu-action" id="pullCloud">Bajar cambios</button><button class="menu-action" id="pushCloud">Subir ahora</button></div>`,footer:'<button class="secondary-btn" data-close-sheet>Cerrar</button>',onOpen(){$('#pullCloud').onclick=async()=>{await cloud.pull();closeSheet();toast('Datos actualizados','success')};$('#pushCloud').onclick=async()=>{await cloud.push();closeSheet();toast('Sincronizado','success')}}})}
+function moreSheet(){openSheet({eyebrow:'Herramientas',title:'Escenario',body:'<div class="sheet-actions"><a class="menu-action menu-link" href="./help.html?v=25">Cómo usar la app</a><button class="menu-action" data-more="rename">Renombrar escenario</button><button class="menu-action" data-more="duplicate">Duplicar escenario</button><button class="menu-action" data-more="cloud">Supabase / Sync</button><button class="menu-action" data-more="home">Cambiar escenario</button></div>',footer:'<button class="secondary-btn" data-close-sheet>Cerrar</button>',onOpen(){$('#sheetBody').onclick=e=>{const action=e.target.closest('[data-more]')?.dataset.more;if(!action)return;if(action==='rename'){const name=prompt('Nombre',store.currentScenario()?.name||'');if(name)store.renameCurrent(name);closeSheet()}if(action==='duplicate'){store.duplicateCurrent();closeSheet();toast('Copia creada','success')}if(action==='cloud')cloudSheet();if(action==='home'){closeSheet();showStartup()}}}})}
+function searchSheet(){openSheet({eyebrow:'Buscar',title:'Añadir contenido',body:'<label class="search-field"><span>⌕</span><input id="quickSearch" type="search" placeholder="Buscar contenido"></label><div class="sheet-actions" id="quickResults"></div>',footer:'<button class="secondary-btn" data-close-sheet>Cerrar</button>',onOpen(){const input=$('#quickSearch'),output=$('#quickResults');const run=()=>{const q=input.value.toLowerCase();output.innerHTML=store.allTemplates().filter(x=>!q||[x.title,x.type,x.role].join(' ').toLowerCase().includes(q)).slice(0,20).map(x=>`<button class="menu-action" data-add="${esc(x.id)}"><b>${esc(x.title)}</b><br><small>${esc(x.lot)} · añadir a ${DN[store.state.ui.selectedDow]}</small></button>`).join('')||'<div class="empty-state"><b>Sin resultados</b></div>'};input.oninput=run;output.onclick=e=>{const id=e.target.closest('[data-add]')?.dataset.add;if(id){store.addToDay(id,store.state.ui.selectedDow);closeSheet();toast('Añadido al plan','success')}};run()}})}
+
+function bind(){
+  $$('.bottom-nav [data-nav]').forEach(b=>b.onclick=()=>navigate(b.dataset.nav));
+  $('#scenarioHomeBtn').onclick=showStartup;$('#useExistingBtn').onclick=scenarioPicker;$('#createScenarioBtn').onclick=scenarioCreate;
+  $('#recentScenario').onclick=e=>{const id=e.target.closest('[data-open-scenario]')?.dataset.openScenario;if(id&&store.openScenario(id))enterApp()};
+  $('#railSearch').oninput=renderRail;$('#railFilters').onclick=e=>{const f=e.target.closest('[data-rail-filter]')?.dataset.railFilter;if(f){store.state.ui.catalogFilter=f;renderRail()}};
+  $('#contentRail').onclick=e=>{const id=e.target.closest('[data-template-id]')?.dataset.templateId;if(id){store.addToDay(id,store.state.ui.selectedDow);toast(`Añadido a ${DN[store.state.ui.selectedDow]}`,'success')}};
+  $('#railExpandBtn').onclick=()=>$('#contentRailShell').classList.toggle('expanded');$('#newContentBtn').onclick=contentCreate;
+  $('#dayTabs').onclick=e=>{const d=e.target.closest('[data-day]')?.dataset.day;if(d!==undefined){store.state.ui.selectedDow=Number(d);renderPlanner()}};
+  $('#weekBoard').onclick=e=>{const b=e.target.closest('[data-card-menu]');if(b)showCardMenu(Number(b.dataset.dow),b.dataset.cardMenu)};
+  $('#brandSelect').onchange=e=>store.setActiveBrand(e.target.value);
+  $('#prevWeekBtn').onclick=()=>{const d=weekStart();d.setDate(d.getDate()-7);store.setAnchorDate(d.toISOString().slice(0,10))};
+  $('#nextWeekBtn').onclick=()=>{const d=weekStart();d.setDate(d.getDate()+7);store.setAnchorDate(d.toISOString().slice(0,10))};
+  $('#todayBtn').onclick=()=>store.setAnchorDate(new Date().toISOString().slice(0,10));$('#saveCopyBtn').onclick=()=>{store.duplicateCurrent();toast('Escenario duplicado','success')};
+  $('#platformTabs').onclick=e=>{const p=e.target.closest('[data-platform]')?.dataset.platform;if(p){store.state.ui.platform=p;renderPlatforms();renderFeedInspector()}};
+  $('#instagramMode').onclick=e=>{const m=e.target.closest('[data-mode]')?.dataset.mode;if(m){store.state.ui.instagramMode=m;hub.setInstagramMode(m);renderPlatforms()}};
+  $('#libraryTabs').onclick=e=>{const t=e.target.closest('[data-library]')?.dataset.library;if(t){store.state.ui.libraryTab=t;renderLibrary()}};$('#librarySearch').oninput=renderLibrary;$('#libraryCreateBtn').onclick=()=>simpleCreate(store.state.ui.libraryTab);
+  $('#playBtn').onclick=startSimulation;$('#simPause').onclick=()=>store.state.ui.simPlaying?stopSimulation():startSimulation();$('#simPrev').onclick=()=>activateSimulation(store.state.ui.simIndex-1);$('#simNext').onclick=()=>activateSimulation(store.state.ui.simIndex+1);$('#simOpenFeed').onclick=()=>navigate('feeds');
+  $('#fullscreenFeedBtn').onclick=()=>{$('#feedModal').hidden=false;$('#feedModalTitle').textContent=feeds.name(store.state.ui.platform);hub.cloneActiveInto($('#modalFeedHost'));document.body.classList.add('modal-open')};$('#feedModalClose').onclick=()=>{$('#feedModal').hidden=true;document.body.classList.remove('modal-open')};
+  $('#sheetClose').onclick=closeSheet;$('#sheetBackdrop').onclick=closeSheet;document.addEventListener('click',e=>{if(e.target.closest('[data-close-sheet]'))closeSheet()});$('#moreBtn').onclick=moreSheet;$('#searchBtn').onclick=searchSheet;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#feedModal').hidden){$('#feedModal').hidden=true;document.body.classList.remove('modal-open')}else closeSheet()}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();searchSheet()}});
+  $$('[data-feed-surface]').forEach(surface=>surface.addEventListener('click',e=>{const node=e.target.closest('[data-occurrence]');if(!node)return;const post=feeds.find(node.dataset.occurrence);if(!post)return;store.state.ui.activeOccurrenceId=post.occurrenceId;store.state.ui.platform=post.platform;hub.activate(post.occurrenceId,post.platform);renderPlatforms();renderFeedInspector()}));
+  $('[data-feed-surface="tiktok"]')?.addEventListener('feed-active',e=>{store.state.ui.activeOccurrenceId=e.detail.id;renderFeedInspector()});
+}
+function subscriptions(){store.subscribe('planner',()=>{feeds.invalidate();renderPlanner();renderScenarioHeader()});store.subscribe('feeds',()=>{feeds.invalidate();syncFeeds();renderSimulation()});store.subscribe('catalog',renderRail);store.subscribe('library',()=>{renderLibrary();renderBrands()});store.subscribe('scenario',()=>{renderScenarioHeader();renderStartup()});store.subscribe('cloud',renderCloud);store.subscribe('autosave',renderScenarioHeader);store.subscribe('persist',async()=>{const cloud=await getCloud();cloud?.schedule?.()})}
+
+export function initUI(){
+  hub=new FeedControllerHub();
+  bind();subscriptions();renderStartup();renderBrands();renderRail();renderLibrary();renderCloud();hub.syncAll();renderPlatforms();
+  if(store.state.currentScenarioId)enterApp();
+  window.__editorialEmulatorUIReady=true;
+}
