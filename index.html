@@ -6,25 +6,26 @@
 <meta name="theme-color" content="#0a0b0e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="editorial-emulator-build" content="2.7">
-<title>Editorial Emulator V2.7</title>
-<link rel="manifest" href="./manifest.webmanifest?v=27">
+<meta name="editorial-emulator-build" content="2.8">
+<title>Editorial Emulator V2.8</title>
+<link rel="manifest" href="./manifest.webmanifest?v=28">
 <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./css/system-v27.css?v=27">
+<link rel="stylesheet" href="./css/system-v28.css?v=28">
 </head>
 <body>
 <div id="fatalBanner" class="fatal" hidden><b>El Emulador encontró un problema.</b><span id="fatalText"></span><button id="fatalReload">Recargar limpio</button></div>
 <section id="startup" class="startup">
   <div class="startup-shell glass-panel">
     <div class="brand-mark">EE</div>
-    <span class="eyebrow">Editorial Emulator V2.7</span>
+    <span class="eyebrow">Editorial Emulator V2.8</span>
     <h1>¿Qué quieres emular?</h1>
     <p class="lede">Crea o abre un escenario y empieza a trabajar al instante. Supabase sincroniza después; nunca bloquea la interfaz.</p>
     <div id="recentScenario" class="recent-slot"></div>
     <div class="startup-actions">
       <button id="useExistingBtn" class="btn btn-primary">Usar escenario existente</button>
       <button id="createScenarioBtn" class="btn btn-secondary">＋ Crear escenario nuevo</button>
-      <a href="./help.html?v=27" class="btn btn-ghost">Cómo usar la app</a>
+      <a href="./help.html?v=28" class="btn btn-ghost">Cómo usar la app</a>
     </div>
     <div class="quick-grid">
       <article><b>1 · Escenario</b><span>Abre, continúa o crea una variante.</span></article>
@@ -34,6 +35,7 @@
     </div>
   </div>
 </section>
+
 <div id="app" class="app" hidden>
   <aside class="side-nav glass-nav">
     <div class="side-brand">EE</div>
@@ -41,12 +43,14 @@
     <button data-nav="feeds" class="side-item"><span>◫</span><b>Feeds</b></button>
     <button data-nav="library" class="side-item"><span>⌘</span><b>Biblioteca</b></button>
     <div class="side-spacer"></div>
-    <a class="side-item" href="./help.html?v=27"><span>?</span><b>Ayuda</b></a>
+    <a class="side-item" href="./help.html?v=28"><span>?</span><b>Ayuda</b></a>
   </aside>
+
   <header class="topbar glass-nav">
     <div class="top-left"><button id="scenarioHomeBtn" class="icon-btn" aria-label="Escenarios">‹</button><div><span class="eyebrow">Editorial Emulator</span><h2 id="screenTitle">Plan</h2></div></div>
     <div class="top-actions"><span id="autosavePill" class="status ok">✓ Guardado</span><span id="syncPill" class="status">Local</span><button id="searchBtn" class="icon-btn" aria-label="Buscar">⌕</button><button id="moreBtn" class="icon-btn" aria-label="Más">•••</button></div>
   </header>
+
   <main class="workspace">
     <section id="planView" class="view active" data-view="plan">
       <div class="hero-row">
@@ -58,27 +62,51 @@
       <section id="contentRailShell" class="content-rail-shell glass-panel"><div class="rail-head"><div><span class="eyebrow">Contenidos</span><b>Arrastra o toca para añadir</b></div><div class="rail-actions"><input id="railSearch" placeholder="Buscar contenido"><button id="newContentBtn" class="btn btn-primary compact">＋ Nuevo</button></div></div><div id="railFilters" class="chips"></div><div id="contentRail" class="content-rail"></div></section>
       <div id="simulationStrip" class="sim-strip" hidden><button id="simPrev" class="icon-btn">‹</button><div class="sim-copy"><small id="simCounter"></small><b id="simTitle"></b><span id="simMeta"></span></div><button id="simPause" class="icon-btn">Ⅱ</button><button id="simNext" class="icon-btn">›</button><button id="simOpenFeed" class="btn btn-secondary">Ver feed</button></div>
     </section>
+
     <section id="feedsView" class="view" data-view="feeds">
       <div class="hero-row"><div><span class="eyebrow">Simulación persistente</span><h1>Feeds</h1><p>Mobile y Desktop conservan scroll y estado. Cambiar de vista no reconstruye toda la app.</p></div></div>
       <div class="feed-toolbar glass-panel">
         <div id="platformTabs" class="platform-tabs"></div>
-        <div class="feed-toolbar-right"><div class="seg" id="deviceModeSeg"><button data-device="mobile" class="active">Mobile</button><button data-device="desktop">Desktop</button></div><div id="viewModeTabs" class="seg"></div></div>
+        <div class="feed-toolbar-right">
+          <div class="seg" id="deviceModeSeg"><button data-device="mobile" class="active">Mobile</button><button data-device="desktop">Desktop</button></div>
+          <div id="viewModeTabs" class="seg"></div>
+        </div>
       </div>
+
       <div class="feed-layout">
-        <div class="device-stage"><div id="deviceShell" class="device mobile-mode"><div class="desktop-browserbar"><span>● ● ●</span><b id="desktopAppTitle">Instagram</b><span>⌕　☰</span></div><div class="island"></div><div id="feedViewport" class="device-screen">
-          <section class="feed-surface active" data-platform="instagram"><div class="appbar igbar"><b>joc</b><span>＋ ♡ ☰</span></div><div id="instagramProfile" class="instagram-profile"><div class="profile-head"><div class="avatar">J</div><div><b id="igCount">0</b><small>posts</small></div><div><b>12.4K</b><small>seguidores</small></div><div><b>831</b><small>siguiendo</small></div></div><div class="profile-bio"><b>JOC</b><br>Ventas, criterio y ejecución.</div><div id="instagramGrid" class="ig-grid feed-grid"></div></div><div id="instagramFeed" class="ig-feed" hidden></div><div id="instagramPlayer" class="reels-player" hidden></div></section>
-          <section class="feed-surface" data-platform="tiktok"><div class="tiktok-chrome"><div class="tt-top">Siguiendo　<b>Para ti</b></div><div id="tiktokGrid" class="feed-grid tt-grid" hidden></div><div id="tiktokFeed" class="tt-feed"></div><div class="tt-bottom">⌂　♧　＋　▣　●</div></div></section>
-          <section class="feed-surface" data-platform="linkedin"><div class="appbar libar"><b>in</b><span>Buscar　✉</span></div><div id="linkedinGrid" class="feed-grid social-grid" hidden></div><div id="linkedinFeed" class="social-feed"></div></section>
-          <section class="feed-surface" data-platform="youtube"><div class="appbar ytbar"><b>▶ YouTube</b><span>⌕　◉</span></div><div id="youtubeGrid" class="feed-grid yt-grid" hidden></div><div id="youtubeFeed" class="youtube-feed"></div><div id="youtubePlayer" class="youtube-player" hidden></div></section>
-          <section class="feed-surface" data-platform="facebook"><div class="appbar fbbar"><b>facebook</b><span>＋　⌕　☰</span></div><div id="facebookGrid" class="feed-grid social-grid" hidden></div><div id="facebookFeed" class="social-feed"></div></section>
-        </div></div><p class="viewer-hint">Desliza dentro del visor. En Desktop puedes recorrer la app simulada completa.</p></div>
-        <aside class="inspector"><div class="panel"><span class="eyebrow">Publicación activa</span><h3 id="activePostTitle">Ninguna</h3><div id="activePostMeta"></div></div><div class="panel"><span class="eyebrow">Semana</span><h3 id="feedWeekSummary">0 publicaciones</h3><div id="feedMetrics"></div></div><div class="panel"><span class="eyebrow">Vista</span><p id="viewerModeDescription">Perfil / Grid móvil.</p></div></aside>
+        <div class="device-stage">
+          <div id="deviceShell" class="device mobile-mode">
+            <div class="desktop-browserbar"><span>● ● ●</span><b id="desktopAppTitle">Instagram</b><span>⌕　☰</span></div>
+            <div class="island"></div>
+            <div id="feedViewport" class="device-screen">
+              <section class="feed-surface active" data-platform="instagram">
+                <div class="appbar igbar"><b>joc</b><span>＋ ♡ ☰</span></div>
+                <div id="instagramProfile" class="instagram-profile"><div class="profile-head"><div class="avatar">J</div><div><b id="igCount">0</b><small>posts</small></div><div><b>12.4K</b><small>seguidores</small></div><div><b>831</b><small>siguiendo</small></div></div><div class="profile-bio"><b>JOC</b><br>Ventas, criterio y ejecución.</div><div id="instagramGrid" class="ig-grid feed-grid"></div></div>
+                <div id="instagramFeed" class="ig-feed" hidden></div>
+                <div id="instagramPlayer" class="reels-player" hidden></div>
+              </section>
+              <section class="feed-surface" data-platform="tiktok"><div class="tiktok-chrome"><div class="tt-top">Siguiendo　<b>Para ti</b></div><div id="tiktokGrid" class="feed-grid tt-grid" hidden></div><div id="tiktokFeed" class="tt-feed"></div><div class="tt-bottom">⌂　♧　＋　▣　●</div></div></section>
+              <section class="feed-surface" data-platform="linkedin"><div class="appbar libar"><b>in</b><span>Buscar　✉</span></div><div id="linkedinGrid" class="feed-grid social-grid" hidden></div><div id="linkedinFeed" class="social-feed"></div></section>
+              <section class="feed-surface" data-platform="youtube"><div class="appbar ytbar"><b>▶ YouTube</b><span>⌕　◉</span></div><div id="youtubeGrid" class="feed-grid yt-grid" hidden></div><div id="youtubeFeed" class="youtube-feed"></div><div id="youtubePlayer" class="youtube-player" hidden></div></section>
+              <section class="feed-surface" data-platform="facebook"><div class="appbar fbbar"><b>facebook</b><span>＋　⌕　☰</span></div><div id="facebookGrid" class="feed-grid social-grid" hidden></div><div id="facebookFeed" class="social-feed"></div></section>
+            </div>
+          </div>
+          <p class="viewer-hint">Desliza dentro del visor. En Desktop puedes recorrer la app simulada completa.</p>
+        </div>
+        <aside class="inspector">
+          <div class="panel"><span class="eyebrow">Publicación activa</span><h3 id="activePostTitle">Ninguna</h3><div id="activePostMeta"></div></div>
+          <div class="panel"><span class="eyebrow">Semana</span><h3 id="feedWeekSummary">0 publicaciones</h3><div id="feedMetrics"></div></div>
+          <div class="panel"><span class="eyebrow">Vista</span><p id="viewerModeDescription">Perfil / Grid móvil.</p></div>
+        </aside>
       </div>
     </section>
+
     <section id="libraryView" class="view" data-view="library"><div class="hero-row"><div><span class="eyebrow">Datos compartidos</span><h1>Biblioteca</h1><p>Contenido, pilares, familias, marcas y escenarios.</p></div><button id="libraryCreateBtn" class="btn btn-primary">＋ Crear</button></div><div id="libraryTabs" class="library-tabs"><button data-library="content" class="active">Contenido</button><button data-library="pillars">Pilares</button><button data-library="families">Familias</button><button data-library="brands">Marcas</button><button data-library="scenarios">Escenarios</button></div><input id="librarySearch" class="library-search" placeholder="Buscar en biblioteca"><div id="libraryList" class="library-list"></div></section>
   </main>
+
   <nav class="bottom-nav glass-nav"><button data-nav="plan" class="active">▦<b>Plan</b></button><button data-nav="feeds">◫<b>Feeds</b></button><button data-nav="library">⌘<b>Biblioteca</b></button></nav>
 </div>
+
 <div id="sheetBackdrop" class="sheet-backdrop" hidden></div><section id="sheet" class="sheet" hidden><div class="grabber"></div><div class="sheet-head"><div><span id="sheetEyebrow" class="eyebrow"></span><h2 id="sheetTitle"></h2></div><button id="sheetClose" class="icon-btn">×</button></div><div id="sheetBody" class="sheet-body"></div><div id="sheetFooter" class="sheet-footer"></div></section><div id="toastRegion" class="toasts" aria-live="polite"></div>
-<script src="./supabase-config.js?v=27"></script><script src="./js/runtime-v27.js?v=27"></script>
+<script src="./supabase-config.js?v=28"></script><script src="./js/runtime-v27.js?v=27"></script><script src="./js/ux-v28.js?v=28"></script><script type="module" src="./js/liquidglass-v28.js?v=28"></script>
 </body></html>
