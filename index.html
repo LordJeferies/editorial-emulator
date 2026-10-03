@@ -7,36 +7,37 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Editorial Emulator">
-  <meta name="editorial-emulator-build" content="2.3">
-  <title>Editorial Emulator V2.3</title>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="editorial-emulator-build" content="2.4">
+  <title>Editorial Emulator V2.4</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=24">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./css/app.css?v=23">
-  <link rel="stylesheet" href="./css/onboarding-v23.css?v=23">
+  <link rel="stylesheet" href="./css/app.css?v=24">
+  <link rel="stylesheet" href="./css/onboarding-v23.css?v=24">
+  <link rel="stylesheet" href="./css/system-v24.css?v=24">
 </head>
 <body>
 <div id="startup" class="startup" aria-live="polite">
   <div class="startup-card">
     <div class="brand-mark">EE</div>
-    <div class="eyebrow">Editorial Emulator V2.3</div>
+    <div class="eyebrow">Editorial Emulator V2.4</div>
     <h1>¿Qué quieres emular?</h1>
-    <p>Abre un escenario guardado o crea uno nuevo. Todo se autosalva y sigue conectado al mismo Editorial OS.</p>
+    <p>Abre un escenario guardado o crea uno nuevo. El trabajo se guarda localmente al instante y Supabase sincroniza en segundo plano cuando hay una sesión válida.</p>
     <div id="recentScenario" class="recent-scenario"></div>
     <div class="startup-actions">
       <button class="primary-btn" id="useExistingBtn">Usar escenario existente</button>
       <button class="secondary-btn" id="createScenarioBtn">＋ Crear escenario nuevo</button>
-      <a class="secondary-btn help-link" href="./help.html?v=23">Cómo usar la app</a>
+      <a class="secondary-btn help-link" href="./help.html?v=24">Cómo usar la app</a>
     </div>
     <div class="startup-guide" aria-label="Inicio rápido">
       <article><span>1</span><b>Escenario</b><p>Continúa uno guardado o crea una semana nueva.</p></article>
-      <article><span>2</span><b>Plan</b><p>Arrastra contenidos a los días y ordena la semana.</p></article>
+      <article><span>2</span><b>Plan</b><p>Arrastra o toca contenidos para colocarlos en la semana.</p></article>
       <article><span>3</span><b>Play</b><p>Recorre la secuencia sin reconstruir los feeds.</p></article>
       <article><span>4</span><b>Feeds</b><p>Revisa Instagram, TikTok, LinkedIn, YouTube y Facebook.</p></article>
     </div>
-    <div class="startup-note">Si no sabes por dónde empezar, abre <b>Cómo usar la app</b>: incluye el flujo completo y ejemplos para continuar, crear una semana nueva, duplicar escenarios y revisar una campaña.</div>
+    <div class="startup-note">La app no necesita conectarse a Supabase para abrir ni para editar. La nube es una capa de sincronización; la interfaz siempre debe seguir operativa.</div>
     <div class="boot-error" id="bootError" hidden>
       <b>No se pudo iniciar el Emulador.</b>
-      <p>La interfaz detectó un problema al cargar los módulos. Recarga esta página. Si continúa, abre <a href="./help.html?v=23">la guía</a> y revisa el detalle: <span data-boot-detail>error desconocido</span>.</p>
+      <p>Ocurrió un error al cargar la interfaz. Recarga esta página. Si continúa, abre <a href="./help.html?v=24">la guía</a>. Detalle técnico: <span data-boot-detail>error desconocido</span>.</p>
     </div>
   </div>
 </div>
@@ -51,10 +52,10 @@
       </div>
     </div>
     <div class="topbar-actions">
-      <span id="autosavePill" class="sync-pill">Guardado</span>
+      <span id="autosavePill" class="sync-pill synced">✓ Guardado</span>
       <span id="syncPill" class="sync-pill">Local</span>
       <button class="icon-btn" id="searchBtn" aria-label="Buscar">⌕</button>
-      <a class="icon-btn help-link" href="./help.html?v=23" aria-label="Cómo usar la app">?</a>
+      <a class="icon-btn topbar-help" href="./help.html?v=24" aria-label="Cómo usar la app">?</a>
       <button class="icon-btn" id="moreBtn" aria-label="Más opciones">•••</button>
     </div>
   </header>
@@ -65,7 +66,7 @@
         <div>
           <div class="eyebrow" id="weekLabel">Semana</div>
           <h2 id="scenarioNameHeading">Escenario</h2>
-          <p>Arrastra contenido desde la bandeja a cualquier día. Pulsa Play para recorrer las publicaciones sin reconstruir los feeds.</p>
+          <p>Arrastra contenido desde la bandeja a cualquier día. En touch también puedes tocar una ficha para añadirla al día activo.</p>
         </div>
         <div class="page-actions">
           <button class="secondary-btn" id="saveCopyBtn">Duplicar</button>
@@ -88,9 +89,9 @@
 
       <section class="content-rail-shell" id="contentRailShell">
         <div class="content-rail-head">
-          <div><span class="eyebrow">Contenidos</span><b>Arrastra al plan</b></div>
+          <div><span class="eyebrow">Contenidos</span><b>Arrastra o toca para añadir</b></div>
           <div class="rail-tools">
-            <label class="rail-search"><span>⌕</span><input id="railSearch" type="search" placeholder="Buscar"></label>
+            <label class="rail-search"><span>⌕</span><input id="railSearch" type="search" placeholder="Buscar" aria-label="Buscar contenidos"></label>
             <button class="icon-btn" id="railExpandBtn" aria-label="Expandir catálogo">⌃</button>
             <button class="primary-btn compact" id="newContentBtn">＋ Nuevo</button>
           </div>
@@ -161,7 +162,7 @@
               </section>
             </div>
           </div>
-          <div class="viewer-hint">Desliza dentro del teléfono. Los feeds ya no se desmontan al cambiar de app.</div>
+          <div class="viewer-hint">Desliza dentro del teléfono. Los feeds no se desmontan al cambiar de app.</div>
         </div>
         <aside class="feed-inspector">
           <div class="inspector-card"><span class="eyebrow">Publicación activa</span><b id="activePostTitle">Ninguna</b><div id="activePostMeta"></div></div>
@@ -174,23 +175,23 @@
     <section class="view" id="libraryView" data-view="library">
       <div class="page-head"><div><div class="eyebrow">Datos compartidos</div><h2>Biblioteca</h2><p>Contenido, pilares, familias, marcas y escenarios del mismo sistema editorial.</p></div><div class="page-actions"><button class="primary-btn" id="libraryCreateBtn">＋ Crear</button></div></div>
       <div class="library-tabs" id="libraryTabs"><button class="active" data-library="content">Contenido</button><button data-library="pillars">Pilares</button><button data-library="families">Familias</button><button data-library="brands">Marcas</button><button data-library="scenarios">Escenarios</button></div>
-      <div class="library-toolbar"><label class="search-field"><span>⌕</span><input id="librarySearch" type="search" placeholder="Buscar"></label></div>
+      <div class="library-toolbar"><label class="search-field"><span>⌕</span><input id="librarySearch" type="search" placeholder="Buscar" aria-label="Buscar en biblioteca"></label></div>
       <div id="libraryList" class="library-list"></div>
     </section>
   </main>
 
-  <nav class="bottom-nav"><button class="active" data-nav="plan"><span>▦</span><b>Plan</b></button><button data-nav="feeds"><span>◫</span><b>Feeds</b></button><button data-nav="library"><span>⌘</span><b>Biblioteca</b></button></nav>
+  <nav class="bottom-nav" aria-label="Navegación principal"><button class="active" data-nav="plan"><span>▦</span><b>Plan</b></button><button data-nav="feeds"><span>◫</span><b>Feeds</b></button><button data-nav="library"><span>⌘</span><b>Biblioteca</b></button></nav>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
-<section class="sheet" id="sheet" aria-modal="true" role="dialog" hidden><div class="sheet-grabber"></div><div class="sheet-head"><div><span class="eyebrow" id="sheetEyebrow">Acción</span><h3 id="sheetTitle">Detalle</h3></div><button class="icon-btn" id="sheetClose">×</button></div><div class="sheet-body" id="sheetBody"></div><div class="sheet-footer" id="sheetFooter"></div></section>
+<section class="sheet" id="sheet" aria-modal="true" role="dialog" hidden><div class="sheet-grabber"></div><div class="sheet-head"><div><span class="eyebrow" id="sheetEyebrow">Acción</span><h3 id="sheetTitle">Detalle</h3></div><button class="icon-btn" id="sheetClose" aria-label="Cerrar">×</button></div><div class="sheet-body" id="sheetBody"></div><div class="sheet-footer" id="sheetFooter"></div></section>
 
-<div class="modal" id="feedModal" hidden><div class="modal-toolbar"><button class="icon-btn" id="feedModalClose">×</button><b id="feedModalTitle">Feed</b><span></span></div><div class="modal-feed"><div class="phone-frame expanded"><div class="phone-notch"></div><div class="phone-screen" id="modalFeedHost"></div></div></div></div>
+<div class="modal" id="feedModal" hidden><div class="modal-toolbar"><button class="icon-btn" id="feedModalClose" aria-label="Cerrar visor">×</button><b id="feedModalTitle">Feed</b><span></span></div><div class="modal-feed"><div class="phone-frame expanded"><div class="phone-notch"></div><div class="phone-screen" id="modalFeedHost"></div></div></div></div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
 
-<script src="./supabase-config.js?v=23"></script>
+<script src="./supabase-config.js?v=24"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-<script type="module" src="./js/boot-v23.js?v=23"></script>
+<script type="module" src="./js/boot-v24.js?v=24"></script>
 </body>
 </html>
