@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+  <meta name="theme-color" content="#0b0c0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Emulador Editorial">
+  <title>Editorial Emulator</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+<div id="app" class="app-shell">
+  <header class="topbar">
+    <div class="topbar-leading">
+      <button class="icon-btn desktop-only" id="sidebarToggle" aria-label="Catálogo">☰</button>
+      <div>
+        <div class="eyebrow">Editorial Emulator</div>
+        <h1 id="screenTitle">Plan</h1>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span id="syncPill" class="sync-pill">Local</span>
+      <button class="icon-btn" id="searchBtn" aria-label="Buscar">⌕</button>
+      <button class="icon-btn" id="moreBtn" aria-label="Más opciones">•••</button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div><b>Catálogo</b><small id="catalogCount">0 contenidos</small></div>
+      <button class="icon-btn" id="closeSidebar" aria-label="Cerrar">×</button>
+    </div>
+    <label class="search-field"><span>⌕</span><input id="catalogSearch" type="search" placeholder="Buscar contenido"></label>
+    <div class="chip-row" id="catalogFilters"></div>
+    <div id="catalogList" class="catalog-list"></div>
+    <button class="primary-btn sidebar-create" id="newContentBtn">＋ Nuevo contenido</button>
+  </aside>
+
+  <main class="workspace" id="workspace">
+    <section class="view active" id="planView" data-view="plan">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow" id="weekLabel">Semana</div>
+          <h2>Emulador</h2>
+          <p>Construye la semana, pulsa Play y revisa cómo cae cada pieza en los feeds.</p>
+        </div>
+        <div class="page-actions">
+          <button class="secondary-btn" id="openCatalogBtn">＋ Contenido</button>
+          <button class="play-btn" id="playBtn"><span>▶</span> Play</button>
+        </div>
+      </div>
+
+      <div class="toolbar-card">
+        <div class="segmented" id="weekNav">
+          <button id="prevWeekBtn" aria-label="Semana anterior">‹</button>
+          <button id="todayBtn">Esta semana</button>
+          <button id="nextWeekBtn" aria-label="Semana siguiente">›</button>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <label class="compact-select"><span>Marca</span><select id="brandSelect"></select></label>
+        <label class="compact-select"><span>Escenario</span><select id="scenarioSelect"></select></label>
+      </div>
+
+      <div class="mobile-day-tabs" id="dayTabs"></div>
+      <div class="week-board" id="weekBoard"></div>
+
+      <div class="simulation-strip" id="simulationStrip" hidden>
+        <button class="icon-btn" id="simPrev" aria-label="Anterior">‹</button>
+        <div class="sim-copy"><small id="simCounter">1/1</small><b id="simTitle">Contenido</b><span id="simMeta">Instagram</span></div>
+        <button class="icon-btn" id="simPause" aria-label="Pausa">Ⅱ</button>
+        <button class="icon-btn" id="simNext" aria-label="Siguiente">›</button>
+        <button class="secondary-btn" id="simOpenFeed">Ver feed</button>
+      </div>
+    </section>
+
+    <section class="view" id="feedsView" data-view="feeds">
+      <div class="page-head">
+        <div><div class="eyebrow">Simulación visual</div><h2>Feeds</h2><p>Los visores se precalculan por semana y sólo se actualizan cuando cambia el plan.</p></div>
+        <div class="page-actions"><button class="secondary-btn" id="fullscreenFeedBtn">Expandir visor</button></div>
+      </div>
+      <div class="feed-platform-tabs" id="platformTabs"></div>
+      <div class="feed-layout">
+        <div class="phone-stage">
+          <div class="phone-frame" id="phoneFrame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen" id="phoneScreen"></div>
+          </div>
+          <div class="viewer-hint">Desliza dentro del teléfono para recorrer el feed completo.</div>
+        </div>
+        <aside class="feed-inspector">
+          <div class="inspector-card"><span class="eyebrow">Semana</span><b id="feedWeekSummary">0 publicaciones</b><div id="feedMetrics"></div></div>
+          <div class="inspector-card"><span class="eyebrow">Visor</span><div class="segmented" id="instagramMode"><button data-mode="profile" class="active">Perfil</button><button data-mode="feed">Feed</button></div></div>
+          <div class="inspector-card"><span class="eyebrow">Rendimiento</span><p>Render incremental, caché por revisión y DOM sólo para la plataforma activa.</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="libraryView" data-view="library">
+      <div class="page-head">
+        <div><div class="eyebrow">Datos compartidos</div><h2>Biblioteca</h2><p>Contenido, pilares, familias y marcas usan el mismo estado de Editorial OS.</p></div>
+        <div class="page-actions"><button class="primary-btn" id="libraryCreateBtn">＋ Crear</button></div>
+      </div>
+      <div class="library-tabs" id="libraryTabs">
+        <button class="active" data-library="content">Contenido</button>
+        <button data-library="pillars">Pilares</button>
+        <button data-library="families">Familias</button>
+        <button data-library="brands">Marcas</button>
+        <button data-library="scenarios">Escenarios</button>
+      </div>
+      <div class="library-toolbar">
+        <label class="search-field"><span>⌕</span><input id="librarySearch" type="search" placeholder="Buscar"></label>
+      </div>
+      <div id="libraryList" class="library-list"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button class="active" data-nav="plan"><span>▦</span><b>Plan</b></button>
+    <button data-nav="feeds"><span>◫</span><b>Feeds</b></button>
+    <button data-nav="library"><span>⌘</span><b>Biblioteca</b></button>
+  </nav>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+<section class="sheet" id="sheet" aria-modal="true" role="dialog" hidden>
+  <div class="sheet-grabber"></div>
+  <div class="sheet-head"><div><span class="eyebrow" id="sheetEyebrow">Acción</span><h3 id="sheetTitle">Detalle</h3></div><button class="icon-btn" id="sheetClose" aria-label="Cerrar">×</button></div>
+  <div class="sheet-body" id="sheetBody"></div>
+  <div class="sheet-footer" id="sheetFooter"></div>
+</section>
+
+<div class="modal" id="feedModal" hidden>
+  <div class="modal-toolbar"><button class="icon-btn" id="feedModalClose">×</button><b id="feedModalTitle">Feed</b><span></span></div>
+  <div class="modal-feed" id="modalFeed"></div>
+</div>
+
+<div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+<script src="./supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>

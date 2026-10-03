@@ -1,0 +1,14 @@
+{
+  "id":"./",
+  "name":"Editorial Emulator",
+  "short_name":"Emulator",
+  "description":"Emulador editorial enfocado para probar semanas y feeds.",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#090a0c",
+  "theme_color":"#090a0c",
+  "orientation":"any",
+  "icons":[{"src":"./icons/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}],
+  "shortcuts":[{"name":"Plan","url":"./#plan"},{"name":"Feeds","url":"./#feeds"},{"name":"Biblioteca","url":"./#library"}]
+}
