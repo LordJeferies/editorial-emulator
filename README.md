@@ -1,61 +1,95 @@
-# Editorial Emulator V2.8
+# Editorial Emulator V2.9
 
-Aplicación separada de Editorial OS enfocada en **escenarios, planificación visual, Play y simulación de feeds**.
+Aplicación separada de Editorial OS enfocada en **escenarios, planificación visual, Play y simulación de feeds**, disponible como PWA y como app Desktop para macOS.
 
-## V2.8
+## Arquitectura canónica
 
-V2.8 aplica una revisión de producto/UI más profunda sin reescribir la lógica que ya funciona.
+La aplicación principal sigue siendo la versión pública de GitHub Pages:
 
-### Sistema visual
+`https://lordjeferies.github.io/editorial-emulator/`
 
-- escala centralizada de spacing;
-- pocos radios reutilizables;
-- alturas de controles consistentes;
-- tokens semánticos de superficie, texto, borde, estado y material;
-- tipografía de sistema Apple/system-ui;
-- contraste y elevación más controlados;
-- estados hover/focus/active/disabled;
-- reduced motion y reduced transparency.
+Todas las superficies cliente apuntan a la misma aplicación:
 
-### Responsive
+- navegador;
+- PWA instalada;
+- Safari Web App;
+- `Editorial Emulator.app` para macOS.
 
-La composición cambia por comportamiento, no sólo por ancho:
+La app Desktop no contiene una segunda copia del frontend. Es un wrapper nativo AppKit + WKWebView que carga la URL canónica. Por eso los cambios publicados en GitHub Pages aparecen en Desktop sin reinstalar el `.app`.
 
-- desktop: sidebar + workspace + inspector;
-- tablet: sidebar compacta + workspace, inspector reubicado;
-- móvil: workspace de una columna + navegación inferior + sheets;
-- `visualViewport`, `100dvh` y safe areas;
-- objetivos táctiles de ~44 CSS px;
-- inputs de 16 px para Safari móvil.
+Supabase sigue siendo el backend compartido y la UI conserva el modelo local-first.
 
-### Productividad
+## Descargar para Mac
+
+La landing pública incluye **Descargar para Mac**.
+
+Asset estable:
+
+`https://github.com/LordJeferies/editorial-emulator/releases/download/desktop-latest/Editorial-Emulator-macOS.zip`
+
+Requisitos:
+
+- macOS 13+;
+- Apple Silicon o Intel según la arquitectura en la que se construya el ZIP;
+- el build público actual usa firma ad-hoc, no Developer ID/notarización.
+
+Para tu Mac local, la forma recomendada es construir e instalar desde el repo con `desktop/mac/build-release.sh`.
+
+## Construcción Desktop
+
+Archivos:
+
+- `desktop/mac/App.swift` — ventana AppKit + WKWebView persistente;
+- `desktop/mac/Info.plist` — bundle macOS;
+- `desktop/mac/build.sh` — compila, genera icono cuando Quick Look puede renderizar el SVG, firma ad-hoc y crea ZIP;
+- `desktop/mac/install.sh` — instala en `/Applications` y crea alias en el Escritorio;
+- `desktop/mac/build-release.sh` — build + instalación opcional + publicación opcional en GitHub Release;
+- `.github/workflows/desktop-macos.yml` — genera y actualiza automáticamente el asset estable `desktop-latest`.
+
+La ventana Desktop conserva almacenamiento WebKit persistente y abre enlaces externos fuera de la aplicación. Los enlaces del propio `lordjeferies.github.io` permanecen dentro de la app.
+
+## Plan
+
+- Content Rail visible;
+- añadir por tap o drag;
+- mover entre días;
+- subir/bajar una pieza;
+- Undo / Redo;
+- atajos `Cmd/Ctrl+Z`, `Shift+Cmd/Ctrl+Z`, `Cmd/Ctrl+Y`;
+- Borrar todo con confirmación;
+- Undo restaura inmediatamente un plan vaciado;
+- duplicar escenario;
+- autosave local-first.
+
+## Feeds
+
+Selector de dispositivo:
+
+- Mobile;
+- Desktop.
+
+Modos por plataforma:
+
+- Instagram: Grid / Feed / Reels;
+- TikTok: Grid / Feed vertical;
+- LinkedIn: Grid / Feed;
+- YouTube: Grid / Videos / Player;
+- Facebook: Grid / Feed.
+
+La vista Desktop usa un mockup ancho con browser chrome y grillas mayores. La vista Mobile conserva el mockup de teléfono. El escenario es el mismo: cambiar de dispositivo o modo no duplica los datos.
+
+## Productividad
 
 - `Cmd/Ctrl+K`: Acciones rápidas;
 - `Cmd/Ctrl+N`: nuevo contenido;
 - `/`: buscar contenido;
 - `1 / 2 / 3`: Plan / Feeds / Biblioteca;
 - `Space`: Play/Stop;
-- `?`: ayuda;
-- Undo/Redo y Borrar todo siguen disponibles.
-
-### Feeds
-
-- Mobile / Desktop;
-- Instagram: Grid / Feed / Reels;
-- TikTok: Grid / Feed vertical;
-- LinkedIn: Grid / Feed;
-- YouTube: Grid / Videos / Player;
-- Facebook: Grid / Feed;
-- el escenario no se duplica al cambiar de visor;
-- la vista Desktop amplía grillas y reproductores.
-
-### Liquid Glass
-
-V2.8 usa `@ybouane/liquidglass` únicamente como mejora progresiva sobre la pantalla inicial, que es un root pequeño y ligero. Planner, feeds y biblioteca quedan fuera de la captura WebGL. Si el módulo no carga o el usuario reduce transparencia/movimiento, la UI mantiene el material CSS estable.
+- `?`: ayuda.
 
 ## Local-first
 
-La app no necesita Supabase para abrir, crear escenarios, editar el plan, usar Undo/Redo ni revisar los feeds.
+La app no necesita Supabase para abrir, crear escenarios, editar el plan, usar Undo/Redo o revisar los feeds.
 
 Orden:
 
@@ -77,15 +111,16 @@ Contratos preservados:
 
 ## PWA
 
-- Service Worker `editorial-emulator-v2-8`;
+- Service Worker `editorial-emulator-v2-9`;
 - HTML/CSS/JS en network-first;
-- caches anteriores `editorial-emulator-*` se eliminan al activar la build nueva;
+- caches `editorial-emulator-*` anteriores se eliminan al activar una build nueva;
 - `display: standalone`;
 - safe areas;
 - fallback offline.
 
-## URL
+## URLs
 
 - Repo: `https://github.com/LordJeferies/editorial-emulator`
-- Page: `https://lordjeferies.github.io/editorial-emulator/?v=28`
-- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html?v=28`
+- Page: `https://lordjeferies.github.io/editorial-emulator/?v=29`
+- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html?v=29`
+- Desktop Mac: `https://github.com/LordJeferies/editorial-emulator/releases/download/desktop-latest/Editorial-Emulator-macOS.zip`
