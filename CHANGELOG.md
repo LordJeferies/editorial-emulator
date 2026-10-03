@@ -1,64 +1,76 @@
 # Editorial Emulator
 
+## V2.9 · Desktop macOS + distribución única
+
+### Desktop
+- Nueva `Editorial Emulator.app` nativa ligera construida con AppKit + WKWebView.
+- La `.app` carga la URL canónica `https://lordjeferies.github.io/editorial-emulator/`; no contiene una copia separada del frontend.
+- La UI publicada en GitHub Pages se actualiza dentro de Desktop sin reinstalar la aplicación.
+- Almacenamiento WebKit persistente.
+- Enlaces externos se abren en el navegador por defecto; los enlaces de `lordjeferies.github.io` permanecen dentro de la app.
+- Ventana redimensionable con geometría persistente.
+- Menú nativo con editar, recargar, abrir en navegador y salir.
+
+### Descarga
+- Botón `Descargar para Mac` en la landing pública.
+- Acceso adicional desde la barra superior y la guía.
+- Asset estable: `releases/download/desktop-latest/Editorial-Emulator-macOS.zip`.
+- Workflow GitHub Actions `.github/workflows/desktop-macos.yml` construye el ZIP en macOS y actualiza el asset estable.
+
+### Tooling macOS
+- `desktop/mac/App.swift`
+- `desktop/mac/Info.plist`
+- `desktop/mac/build.sh`
+- `desktop/mac/install.sh`
+- `desktop/mac/build-release.sh`
+- generación de `.app`, icono `.icns` cuando Quick Look puede renderizar el SVG, firma ad-hoc, ZIP, instalación en `/Applications` y alias de Escritorio.
+
+### PWA
+- Cache `editorial-emulator-v2-9`.
+- Manifest y ayuda actualizados a V2.9.
+- La PWA sigue siendo una superficie cliente de la misma aplicación canónica.
+
+## V2.8 · design system + responsive + productividad
+- Tokens visuales y semánticos centralizados.
+- `visualViewport`, safe areas y composición diferenciada desktop/tablet/mobile.
+- Command Palette `Cmd/Ctrl+K`.
+- Atajos de productividad.
+- Ayuda contextual por escenario.
+- Liquid Glass progresivo únicamente en roots pequeños.
+
+## V2.7 · visores + historial de Plan
+- Mobile/Desktop en Feeds.
+- Instagram Grid/Feed/Reels.
+- TikTok Grid/Feed.
+- LinkedIn Grid/Feed.
+- YouTube Grid/Videos/Player.
+- Facebook Grid/Feed.
+- Undo/Redo.
+- Borrar todo con confirmación y recuperación mediante Undo.
+
+## V2.6 · runtime estable
+- Arranque monolítico local-first sin depender de Supabase/CDN para la landing y escenarios.
+- Pointer Events para drag/touch.
+- Error global visible y recarga limpia.
+
 ## V2.5 · reparación funcional + rediseño responsive
 
 ### P0 reparado
-- Se confirmó la causa real de los botones muertos de la landing: `ui-v24.js` tenía una llave `}` extra al cerrar `scenarioCreate()`, por lo que el módulo fallaba al parsear antes de ejecutar `initUI()`.
-- La landing podía dibujarse porque era HTML estático, pero ningún handler llegaba a enlazarse.
-- V2.5 deja de cargar `ui-v24.js`.
-- Nuevo `ui-v25.js` validado con `node --check`.
-- Nuevo `boot-v25.js` validado con `node --check`.
-- `boot-v24.js` queda sólo como compatibilidad y redirige a V2.5.
-
-### Arranque local-first
+- Se confirmó la causa de los botones muertos de la landing en la rama modular anterior: `ui-v24.js` tenía una llave extra al cerrar `scenarioCreate()`.
 - La UI se inicializa antes de Supabase.
 - Abrir/crear escenarios no depende de red, sesión ni SDK cloud.
-- El módulo cloud se importa bajo demanda y sus fallos no bloquean el workspace.
-- La landing actualiza inmediatamente a V2.5 y muestra un error visible si el bootstrap falla.
 
-### Escenarios
-- “Usar escenario existente” abre un selector visual en grid.
-- “Crear escenario nuevo” abre Base JOC / semana vacía / duplicar escenario.
-- Crear entra directamente al workspace y se autosalva localmente.
-- El selector ofrece acceso directo a crear un escenario si aún no existe ninguno.
-
-### Frontend V2.5
-- Nuevo sistema visual `system-v25.css`.
+### Frontend
 - Desktop: navegación lateral compacta + workspace amplio.
 - Mobile/tablet: workspace de una columna + bottom navigation.
-- Content Rail sticky y visible, expandible, con drag/tap fallback.
-- Drop targets con feedback más claro.
-- Cards, sheets, formularios e inspector de feeds con mayor jerarquía.
-- Responsive por CSS logical pixels, safe areas y `100dvh`.
-- Inputs >=16px y targets principales >=44px.
-- `content-visibility` para tarjetas largas de feeds.
-- reduced motion.
-
-### PWA/cache
-- Cache `editorial-emulator-v2-5`.
-- HTML/CSS/JS/manifest en network-first.
-- Se eliminan caches `editorial-emulator-*` anteriores al activar V2.5.
-- `start_url` y shortcuts usan `?v=25`.
-
-## V2.4 · intento de recuperación con regresión de parsing
-
-V2.4 introdujo mejoras de diseño y local-first, pero la versión publicada de `ui-v24.js` contenía un error de sintaxis en `scenarioCreate()`. Por ello la landing se veía correctamente pero los botones no podían enlazarse. V2.5 sustituye ese runtime completo.
+- Content Rail sticky y visible.
+- Safe areas, `100dvh`, inputs >=16px y targets principales >=44px.
 
 ## V2
-
-- Landing de escenarios: continuar, abrir existente o crear nuevo.
-- Autosave de escenario activo.
-- Base JOC / semana vacía / duplicar escenario.
-- Content Rail persistente y expandible.
-- SortableJS clone desde rail + reorder/move entre días.
-- Store por canales; se elimina render global como reacción normal.
-- Cache de ocurrencias por revisión de datos.
-- Feed controllers persistentes.
-- Instagram Profile/Feed persistentes.
-- TikTok vertical scroll-snap con metadata de contenido real.
-- LinkedIn y Facebook con shells separados.
-- YouTube distingue Shorts vs horizontal/episodio.
-- Play activa y desplaza a una occurrence existente.
-- Inspector de publicación activa.
-- Formularios simplificados para contenido, pilares, familias y marcas.
+- Landing de escenarios.
+- Autosave.
+- Base JOC / semana vacía / duplicar.
+- Content Rail.
+- Feeds persistentes.
+- Play e inspector.
 - Mismo Supabase/workspace/payload que Editorial OS.
