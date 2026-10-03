@@ -6,8 +6,6 @@ Servidor MCP oficial del repositorio `LordJeferies/editorial-emulator`.
 
 Permite que un cliente MCP compatible controle los datos de Editorial Emulator / Editorial OS mediante el mismo Supabase compartido.
 
-Arquitectura:
-
 ```text
 ChatGPT / Codex / Claude / otro cliente MCP
         ↓ stdio
@@ -18,7 +16,7 @@ public.editorial_state / workspace editorial-os
 Editorial Emulator Web / PWA / Desktop
 ```
 
-El MCP no intenta automatizar clicks del navegador. Opera sobre la fuente de datos compartida. La app conectada a Supabase recibe los cambios mediante Realtime.
+El MCP no automatiza clicks del navegador. Opera sobre la fuente de datos compartida.
 
 ## Requisitos
 
@@ -27,72 +25,64 @@ El MCP no intenta automatizar clicks del navegador. Opera sobre la fuente de dat
 - email y contraseña del usuario
 - repo clonado localmente
 
-La URL y la anon key se leen automáticamente de `../supabase-config.js` salvo que se sobrescriban por variables de entorno.
+La URL y la anon key se leen automáticamente de `../supabase-config.js`.
 
-## Instalar
-
-```bash
-cd ~/Downloads/editorial-emulator/mcp
-npm install
-```
-
-## Credenciales
-
-No pongas contraseñas en GitHub.
-
-Usa variables de entorno:
-
-```bash
-export EDITORIAL_SUPABASE_EMAIL="tu-email"
-export EDITORIAL_SUPABASE_PASSWORD="tu-password"
-```
-
-Opcional:
-
-```bash
-export EDITORIAL_WORKSPACE="editorial-os"
-```
-
-## Ejecutar manualmente
+## Instalación recomendada en Mac
 
 ```bash
 cd ~/Downloads/editorial-emulator/mcp
-npm start
+chmod +x setup-mac.sh
+./setup-mac.sh
 ```
 
-Normalmente no se ejecuta a mano: el cliente MCP lo lanza.
+`setup-mac.sh`:
 
-## Configuración MCP genérica
+- verifica Node 20+;
+- instala dependencias;
+- valida `server.mjs`;
+- guarda email y contraseña de Supabase en Keychain;
+- crea `~/.local/bin/editorial-emulator-mcp`;
+- imprime la configuración MCP genérica.
+
+Tus credenciales no quedan guardadas en el repo.
+
+Configuración resultante:
 
 ```json
 {
   "mcpServers": {
     "editorial-emulator": {
-      "command": "node",
-      "args": ["/Users/TU_USUARIO/Downloads/editorial-emulator/mcp/server.mjs"],
-      "env": {
-        "EDITORIAL_SUPABASE_EMAIL": "TU_EMAIL",
-        "EDITORIAL_SUPABASE_PASSWORD": "TU_PASSWORD",
-        "EDITORIAL_WORKSPACE": "editorial-os"
-      }
+      "command": "/Users/TU_USUARIO/.local/bin/editorial-emulator-mcp"
     }
   }
 }
 ```
 
-No subas ese archivo a un repo si contiene contraseña.
+## Instalación genérica
+
+```bash
+cd ~/Downloads/editorial-emulator/mcp
+npm install
+npm run check
+```
+
+Variables de entorno si no usas el setup de Mac:
+
+```bash
+export EDITORIAL_SUPABASE_EMAIL="tu-email"
+export EDITORIAL_SUPABASE_PASSWORD="tu-password"
+export EDITORIAL_WORKSPACE="editorial-os"
+```
 
 ## Tools principales
 
 ### Estado / capacidades
-
 - `editorial_status`
 - `editorial_get_capabilities`
 - `editorial_get_usage_criteria`
 - `editorial_validate_state`
 
 ### Escenarios
-
 - `editorial_list_scenarios`
 - `editorial_get_scenario`
 - `editorial_create_scenario`
@@ -101,7 +91,6 @@ No subas ese archivo a un repo si contiene contraseña.
 - `editorial_delete_scenario`
 
 ### Planner
-
 - `editorial_get_plan`
 - `editorial_add_content`
 - `editorial_move_item`
@@ -111,7 +100,6 @@ No subas ese archivo a un repo si contiene contraseña.
 - `editorial_apply_batch`
 
 ### Biblioteca / taxonomía
-
 - `editorial_list_content`
 - `editorial_create_content`
 - `editorial_update_content`
@@ -119,11 +107,9 @@ No subas ese archivo a un repo si contiene contraseña.
 - `editorial_create_taxonomy`
 
 ### Feeds
-
 - `editorial_preview_feeds`
 
 ### Recuperación
-
 - `editorial_list_backups`
 - `editorial_restore_backup`
 
@@ -135,12 +121,22 @@ Cada mutación MCP crea automáticamente un backup del payload anterior. Se cons
 - NO usa database password.
 - NO usa GitHub PAT.
 - Usa la anon/public key del frontend + login real del usuario.
-- Las operaciones destructivas importantes requieren `confirm=true`.
+- Operaciones destructivas importantes requieren `confirm=true`.
 - Conserva campos del payload que el MCP no necesita modificar.
+
+## Criterio recomendado
+
+1. Leer antes de escribir.
+2. Usar IDs reales.
+3. Evitar contenido duplicado.
+4. Usar `editorial_apply_batch` para cambios relacionados.
+5. Confirmar operaciones destructivas.
+6. Ejecutar `editorial_validate_state` después de cambios grandes.
+7. Separar diagnóstico y ejecución cuando el cambio editorial sea importante.
 
 ## Sincronización con la app
 
-Para ver los cambios inmediatamente en Web/PWA/Desktop:
+Para ver cambios inmediatamente en Web/PWA/Desktop:
 
 1. abre Editorial Emulator;
 2. pulsa el estado Cloud;
@@ -151,9 +147,9 @@ El MCP y la app trabajan sobre `public.editorial_state`, `workspace_key = editor
 
 ## Documentación
 
-- App: https://lordjeferies.github.io/editorial-emulator/?v=31
-- Producto: https://lordjeferies.github.io/editorial-emulator/product.html?v=31
-- MCP: https://lordjeferies.github.io/editorial-emulator/mcp.html?v=31
+- App: https://lordjeferies.github.io/editorial-emulator/?v=32
+- Producto: https://lordjeferies.github.io/editorial-emulator/product.html?v=32
+- Guía MCP paso a paso: https://lordjeferies.github.io/editorial-emulator/mcp.html?v=32
 - Repo: https://github.com/LordJeferies/editorial-emulator
 
 Ver también `EXAMPLES.md` y `CRITERIA.md`.
