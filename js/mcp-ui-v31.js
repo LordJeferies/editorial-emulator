@@ -1,9 +1,9 @@
 (()=>{'use strict';
 const $=(s,r=document)=>r.querySelector(s);
-const APP='https://lordjeferies.github.io/editorial-emulator/?v=31';
-const GUIDE='./mcp.html?v=31';
+const APP='https://lordjeferies.github.io/editorial-emulator/?v=32';
+const GUIDE='./mcp.html?v=32';
 const REPO='https://github.com/LordJeferies/editorial-emulator/tree/main/mcp';
-function patchVersion(){document.title='Editorial Emulator V3.1';document.documentElement.dataset.editorialVersion='3.1-mcp';document.querySelectorAll('.eyebrow').forEach(el=>{if(/Editorial Emulator V2\.9|Editorial Emulator V3\.0/.test(el.textContent))el.textContent=el.textContent.replace(/V(?:2\.9|3\.0)/,'V3.1')});const meta=document.querySelector('meta[name="editorial-emulator-build"]');if(meta)meta.content='3.1'}
+function patchVersion(){document.title='Editorial Emulator V3.2';document.documentElement.dataset.editorialVersion='3.2-mcp';document.querySelectorAll('.eyebrow').forEach(el=>{if(/Editorial Emulator V(?:2\.9|3\.0|3\.1)/.test(el.textContent))el.textContent=el.textContent.replace(/V(?:2\.9|3\.0|3\.1)/,'V3.2')});const meta=document.querySelector('meta[name="editorial-emulator-build"]');if(meta)meta.content='3.2'}
 function cfgSnippet(){const root='/Users/TU_USUARIO/Downloads/editorial-emulator/mcp/server.mjs';return `{
   "mcpServers": {
     "editorial-emulator": {
