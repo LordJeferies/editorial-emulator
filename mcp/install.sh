@@ -5,12 +5,12 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MCP="$ROOT/mcp"
 
 echo
-echo "Editorial Emulator MCP · instalación"
+echo "Editorial Emulator MCP · instalación genérica"
 echo
 
 if ! command -v node >/dev/null 2>&1; then
   echo "ERROR: Node.js 20+ es obligatorio."
-  echo "Instálalo y vuelve a ejecutar este script."
+  echo "En macOS puedes usar el setup recomendado: ./setup-mac.sh"
   exit 1
 fi
 
@@ -21,18 +21,19 @@ if [ "$MAJOR" -lt 20 ]; then
 fi
 
 cd "$MCP"
-npm install
+npm install --no-audit --no-fund
 npm run check
 
 echo
 echo "LISTO"
 echo "Servidor: $MCP/server.mjs"
 echo
-echo "Antes de usarlo configura en tu cliente MCP:"
-echo "  EDITORIAL_SUPABASE_EMAIL"
-echo "  EDITORIAL_SUPABASE_PASSWORD"
+echo "En macOS se recomienda ejecutar también:"
+echo "  chmod +x setup-mac.sh"
+echo "  ./setup-mac.sh"
 echo
-echo "La URL y la anon key se leen automáticamente desde:"
-echo "  $ROOT/supabase-config.js"
+echo "El setup de Mac guarda las credenciales en Keychain y crea:"
+echo "  ~/.local/bin/editorial-emulator-mcp"
 echo
-echo "Guía: https://lordjeferies.github.io/editorial-emulator/mcp.html?v=31"
+echo "Guía paso a paso:"
+echo "  https://lordjeferies.github.io/editorial-emulator/mcp.html?v=32"
