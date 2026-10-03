@@ -1,0 +1,58 @@
+const BUILD='2.3';
+const APP_ASSETS=[
+  './js/ui.js','./js/store.js','./js/defaults.js','./js/cloud.js','./js/feeds.js','./js/controllers.js','./css/app.css'
+];
+
+function showBootError(error){
+  console.error('Editorial Emulator boot failed',error);
+  document.documentElement.dataset.emulatorBuild=BUILD;
+  const box=document.getElementById('bootError');
+  if(box){
+    box.hidden=false;
+    const detail=box.querySelector('[data-boot-detail]');
+    if(detail)detail.textContent=String(error?.message||error||'Error desconocido');
+  }
+}
+
+async function clearOldAppCaches(){
+  if(!('caches' in window))return;
+  try{
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(k=>k.startsWith('editorial-emulator-')).map(k=>caches.delete(k)));
+  }catch(error){
+    console.info('No se pudieron limpiar caches anteriores',error);
+  }
+}
+
+async function refreshServiceWorker(){
+  if(!('serviceWorker' in navigator))return;
+  try{
+    const registration=await navigator.serviceWorker.register('./sw.js?v=23',{updateViaCache:'none'});
+    await registration.update();
+  }catch(error){
+    console.info('Service Worker no disponible; la app seguirá online.',error);
+  }
+}
+
+async function warmFreshModules(){
+  await Promise.all(APP_ASSETS.map(async url=>{
+    try{await fetch(url,{cache:'reload'})}catch{}
+  }));
+}
+
+async function boot(){
+  document.documentElement.dataset.emulatorBuild=BUILD;
+  await clearOldAppCaches();
+  await refreshServiceWorker();
+  await warmFreshModules();
+  const [{initUI},{cloud}]=await Promise.all([
+    import('./ui.js?v=23'),
+    import('./cloud.js?v=23')
+  ]);
+  cloud.init();
+  initUI();
+  window.__editorialEmulatorBooted=true;
+  window.dispatchEvent(new CustomEvent('editorial-emulator:ready',{detail:{build:BUILD}}));
+}
+
+boot().catch(showBootError);
