@@ -3,70 +3,86 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-  <meta name="theme-color" content="#0b0c0f">
+  <meta name="theme-color" content="#0a0b0e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Emulador Editorial">
-  <title>Editorial Emulator</title>
+  <meta name="apple-mobile-web-app-title" content="Editorial Emulator">
+  <title>Editorial Emulator V2</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./css/app.css">
 </head>
 <body>
-<div id="app" class="app-shell">
+<div id="startup" class="startup" aria-live="polite">
+  <div class="startup-card">
+    <div class="brand-mark">EE</div>
+    <div class="eyebrow">Editorial Emulator V2</div>
+    <h1>¿Qué quieres emular?</h1>
+    <p>Abre un escenario guardado o crea uno nuevo. Todo se autosalva y sigue conectado al mismo Editorial OS.</p>
+    <div id="recentScenario" class="recent-scenario"></div>
+    <div class="startup-actions">
+      <button class="primary-btn" id="useExistingBtn">Usar escenario existente</button>
+      <button class="secondary-btn" id="createScenarioBtn">＋ Crear escenario nuevo</button>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app-shell" hidden>
   <header class="topbar">
     <div class="topbar-leading">
-      <button class="icon-btn desktop-only" id="sidebarToggle" aria-label="Catálogo">☰</button>
-      <div>
+      <button class="icon-btn" id="scenarioHomeBtn" aria-label="Escenarios">‹</button>
+      <div class="topbar-title">
         <div class="eyebrow">Editorial Emulator</div>
         <h1 id="screenTitle">Plan</h1>
       </div>
     </div>
     <div class="topbar-actions">
+      <span id="autosavePill" class="sync-pill">Guardado</span>
       <span id="syncPill" class="sync-pill">Local</span>
       <button class="icon-btn" id="searchBtn" aria-label="Buscar">⌕</button>
       <button class="icon-btn" id="moreBtn" aria-label="Más opciones">•••</button>
     </div>
   </header>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-head">
-      <div><b>Catálogo</b><small id="catalogCount">0 contenidos</small></div>
-      <button class="icon-btn" id="closeSidebar" aria-label="Cerrar">×</button>
-    </div>
-    <label class="search-field"><span>⌕</span><input id="catalogSearch" type="search" placeholder="Buscar contenido"></label>
-    <div class="chip-row" id="catalogFilters"></div>
-    <div id="catalogList" class="catalog-list"></div>
-    <button class="primary-btn sidebar-create" id="newContentBtn">＋ Nuevo contenido</button>
-  </aside>
-
-  <main class="workspace" id="workspace">
+  <main class="workspace">
     <section class="view active" id="planView" data-view="plan">
       <div class="page-head">
         <div>
           <div class="eyebrow" id="weekLabel">Semana</div>
-          <h2>Emulador</h2>
-          <p>Construye la semana, pulsa Play y revisa cómo cae cada pieza en los feeds.</p>
+          <h2 id="scenarioNameHeading">Escenario</h2>
+          <p>Arrastra contenido desde la bandeja a cualquier día. Pulsa Play para recorrer las publicaciones sin reconstruir los feeds.</p>
         </div>
         <div class="page-actions">
-          <button class="secondary-btn" id="openCatalogBtn">＋ Contenido</button>
+          <button class="secondary-btn" id="saveCopyBtn">Duplicar</button>
           <button class="play-btn" id="playBtn"><span>▶</span> Play</button>
         </div>
       </div>
 
       <div class="toolbar-card">
-        <div class="segmented" id="weekNav">
+        <div class="segmented">
           <button id="prevWeekBtn" aria-label="Semana anterior">‹</button>
           <button id="todayBtn">Esta semana</button>
           <button id="nextWeekBtn" aria-label="Semana siguiente">›</button>
         </div>
         <div class="toolbar-spacer"></div>
         <label class="compact-select"><span>Marca</span><select id="brandSelect"></select></label>
-        <label class="compact-select"><span>Escenario</span><select id="scenarioSelect"></select></label>
       </div>
 
       <div class="mobile-day-tabs" id="dayTabs"></div>
       <div class="week-board" id="weekBoard"></div>
+
+      <section class="content-rail-shell" id="contentRailShell">
+        <div class="content-rail-head">
+          <div><span class="eyebrow">Contenidos</span><b>Arrastra al plan</b></div>
+          <div class="rail-tools">
+            <label class="rail-search"><span>⌕</span><input id="railSearch" type="search" placeholder="Buscar"></label>
+            <button class="icon-btn" id="railExpandBtn" aria-label="Expandir catálogo">⌃</button>
+            <button class="primary-btn compact" id="newContentBtn">＋ Nuevo</button>
+          </div>
+        </div>
+        <div class="rail-filters" id="railFilters"></div>
+        <div class="content-rail" id="contentRail" aria-label="Catálogo arrastrable"></div>
+      </section>
 
       <div class="simulation-strip" id="simulationStrip" hidden>
         <button class="icon-btn" id="simPrev" aria-label="Anterior">‹</button>
@@ -79,7 +95,7 @@
 
     <section class="view" id="feedsView" data-view="feeds">
       <div class="page-head">
-        <div><div class="eyebrow">Simulación visual</div><h2>Feeds</h2><p>Los visores se precalculan por semana y sólo se actualizan cuando cambia el plan.</p></div>
+        <div><div class="eyebrow">Simulación persistente</div><h2>Feeds</h2><p>Cada app permanece montada. Cambiar de plataforma conserva scroll, post activo y modo.</p></div>
         <div class="page-actions"><button class="secondary-btn" id="fullscreenFeedBtn">Expandir visor</button></div>
       </div>
       <div class="feed-platform-tabs" id="platformTabs"></div>
@@ -87,61 +103,79 @@
         <div class="phone-stage">
           <div class="phone-frame" id="phoneFrame">
             <div class="phone-notch"></div>
-            <div class="phone-screen" id="phoneScreen"></div>
+            <div class="phone-screen" id="phoneScreen">
+              <section class="feed-surface active" data-feed-surface="instagram">
+                <div class="instagram-view active" data-instagram-mode="profile">
+                  <div class="ig-top"><b>joc</b><span>＋ ♡ ☰</span></div>
+                  <div class="ig-profile-head">
+                    <div class="ig-profile-row"><div class="ig-avatar"></div><div class="ig-stat"><b id="igPostCount">0</b>posts</div><div class="ig-stat"><b>12.4K</b>seguidores</div><div class="ig-stat"><b>831</b>siguiendo</div></div>
+                    <div class="ig-bio"><b>JOC</b><br>Ventas, criterio y ejecución.</div>
+                    <div class="ig-profile-actions"><span>Editar perfil</span><span>Compartir perfil</span><span>＋</span></div>
+                  </div>
+                  <div class="ig-grid" id="instagramGrid"></div>
+                </div>
+                <div class="instagram-view" data-instagram-mode="feed">
+                  <div class="ig-top sticky"><b>Instagram</b><span>♡ ✉</span></div>
+                  <div id="instagramFeedList"></div>
+                </div>
+              </section>
+
+              <section class="feed-surface" data-feed-surface="tiktok">
+                <div class="tiktok-top"><span>Siguiendo</span><b>Para ti</b></div>
+                <div class="tiktok-feed" id="tiktokFeed"></div>
+                <div class="tiktok-bottom"><span>⌂<small>Inicio</small></span><span>♧<small>Amigos</small></span><span class="tt-create">＋</span><span>▣<small>Inbox</small></span><span>●<small>Perfil</small></span></div>
+              </section>
+
+              <section class="feed-surface" data-feed-surface="linkedin">
+                <div class="linkedin-top"><b>in</b><span>Buscar</span><span>✉</span></div>
+                <div class="linkedin-feed" id="linkedinFeed"></div>
+                <div class="social-bottom"><span>⌂<small>Inicio</small></span><span>♙<small>Mi red</small></span><span>＋<small>Publicar</small></span><span>♧<small>Alertas</small></span><span>▣<small>Empleos</small></span></div>
+              </section>
+
+              <section class="feed-surface" data-feed-surface="youtube">
+                <div class="youtube-top"><b>▶ YouTube</b><span>⌕　◉</span></div>
+                <div class="youtube-chips"><span>Todos</span><span>Podcast</span><span>Ventas</span><span>Shorts</span></div>
+                <div class="youtube-feed" id="youtubeFeed"></div>
+                <div class="social-bottom"><span>⌂<small>Inicio</small></span><span>◫<small>Shorts</small></span><span>＋</span><span>▣<small>Suscripciones</small></span><span>●<small>Tú</small></span></div>
+              </section>
+
+              <section class="feed-surface" data-feed-surface="facebook">
+                <div class="facebook-top"><b>facebook</b><span>＋　⌕　☰</span></div>
+                <div class="facebook-compose"><span class="social-avatar"></span><span>¿Qué estás pensando?</span></div>
+                <div class="facebook-feed" id="facebookFeed"></div>
+              </section>
+            </div>
           </div>
-          <div class="viewer-hint">Desliza dentro del teléfono para recorrer el feed completo.</div>
+          <div class="viewer-hint">Desliza dentro del teléfono. Los feeds ya no se desmontan al cambiar de app.</div>
         </div>
         <aside class="feed-inspector">
+          <div class="inspector-card"><span class="eyebrow">Publicación activa</span><b id="activePostTitle">Ninguna</b><div id="activePostMeta"></div></div>
           <div class="inspector-card"><span class="eyebrow">Semana</span><b id="feedWeekSummary">0 publicaciones</b><div id="feedMetrics"></div></div>
-          <div class="inspector-card"><span class="eyebrow">Visor</span><div class="segmented" id="instagramMode"><button data-mode="profile" class="active">Perfil</button><button data-mode="feed">Feed</button></div></div>
-          <div class="inspector-card"><span class="eyebrow">Rendimiento</span><p>Render incremental, caché por revisión y DOM sólo para la plataforma activa.</p></div>
+          <div class="inspector-card" id="instagramControls"><span class="eyebrow">Instagram</span><div class="segmented" id="instagramMode"><button data-mode="profile" class="active">Perfil</button><button data-mode="feed">Feed</button></div></div>
         </aside>
       </div>
     </section>
 
     <section class="view" id="libraryView" data-view="library">
-      <div class="page-head">
-        <div><div class="eyebrow">Datos compartidos</div><h2>Biblioteca</h2><p>Contenido, pilares, familias y marcas usan el mismo estado de Editorial OS.</p></div>
-        <div class="page-actions"><button class="primary-btn" id="libraryCreateBtn">＋ Crear</button></div>
-      </div>
-      <div class="library-tabs" id="libraryTabs">
-        <button class="active" data-library="content">Contenido</button>
-        <button data-library="pillars">Pilares</button>
-        <button data-library="families">Familias</button>
-        <button data-library="brands">Marcas</button>
-        <button data-library="scenarios">Escenarios</button>
-      </div>
-      <div class="library-toolbar">
-        <label class="search-field"><span>⌕</span><input id="librarySearch" type="search" placeholder="Buscar"></label>
-      </div>
+      <div class="page-head"><div><div class="eyebrow">Datos compartidos</div><h2>Biblioteca</h2><p>Contenido, pilares, familias, marcas y escenarios del mismo sistema editorial.</p></div><div class="page-actions"><button class="primary-btn" id="libraryCreateBtn">＋ Crear</button></div></div>
+      <div class="library-tabs" id="libraryTabs"><button class="active" data-library="content">Contenido</button><button data-library="pillars">Pilares</button><button data-library="families">Familias</button><button data-library="brands">Marcas</button><button data-library="scenarios">Escenarios</button></div>
+      <div class="library-toolbar"><label class="search-field"><span>⌕</span><input id="librarySearch" type="search" placeholder="Buscar"></label></div>
       <div id="libraryList" class="library-list"></div>
     </section>
   </main>
 
-  <nav class="bottom-nav" aria-label="Navegación principal">
-    <button class="active" data-nav="plan"><span>▦</span><b>Plan</b></button>
-    <button data-nav="feeds"><span>◫</span><b>Feeds</b></button>
-    <button data-nav="library"><span>⌘</span><b>Biblioteca</b></button>
-  </nav>
+  <nav class="bottom-nav"><button class="active" data-nav="plan"><span>▦</span><b>Plan</b></button><button data-nav="feeds"><span>◫</span><b>Feeds</b></button><button data-nav="library"><span>⌘</span><b>Biblioteca</b></button></nav>
 </div>
 
 <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
-<section class="sheet" id="sheet" aria-modal="true" role="dialog" hidden>
-  <div class="sheet-grabber"></div>
-  <div class="sheet-head"><div><span class="eyebrow" id="sheetEyebrow">Acción</span><h3 id="sheetTitle">Detalle</h3></div><button class="icon-btn" id="sheetClose" aria-label="Cerrar">×</button></div>
-  <div class="sheet-body" id="sheetBody"></div>
-  <div class="sheet-footer" id="sheetFooter"></div>
-</section>
+<section class="sheet" id="sheet" aria-modal="true" role="dialog" hidden><div class="sheet-grabber"></div><div class="sheet-head"><div><span class="eyebrow" id="sheetEyebrow">Acción</span><h3 id="sheetTitle">Detalle</h3></div><button class="icon-btn" id="sheetClose">×</button></div><div class="sheet-body" id="sheetBody"></div><div class="sheet-footer" id="sheetFooter"></div></section>
 
-<div class="modal" id="feedModal" hidden>
-  <div class="modal-toolbar"><button class="icon-btn" id="feedModalClose">×</button><b id="feedModalTitle">Feed</b><span></span></div>
-  <div class="modal-feed" id="modalFeed"></div>
-</div>
-
+<div class="modal" id="feedModal" hidden><div class="modal-toolbar"><button class="icon-btn" id="feedModalClose">×</button><b id="feedModalTitle">Feed</b><span></span></div><div class="modal-feed"><div class="phone-frame expanded"><div class="phone-notch"></div><div class="phone-screen" id="modalFeedHost"></div></div></div></div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
 
 <script src="./supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 <script type="module" src="./js/app.js"></script>
 </body>
 </html>

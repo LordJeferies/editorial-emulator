@@ -1,27 +1,31 @@
 #!/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-node --check "$ROOT/js/defaults.js"
-node --check "$ROOT/js/store.js"
-node --check "$ROOT/js/cloud.js"
-node --check "$ROOT/js/feeds.js"
-node --check "$ROOT/js/ui.js"
-node --check "$ROOT/js/app.js"
-node --check "$ROOT/sw.js"
-python3 - <<'PY' "$ROOT"
-import json,sys,re,pathlib
-r=pathlib.Path(sys.argv[1])
-json.load(open(r/'manifest.webmanifest'))
-h=(r/'index.html').read_text()
-ids=re.findall(r'id="([^"]+)"',h)
-dup=sorted({x for x in ids if ids.count(x)>1})
-assert not dup, f'Duplicate IDs: {dup}'
-css=(r/'css/app.css').read_text()
+cd "$ROOT"
+for f in index.html css/app.css js/app.js js/ui.js js/store.js js/defaults.js js/cloud.js js/feeds.js js/controllers.js manifest.webmanifest sw.js; do [ -f "$f" ] || { echo "Falta $f"; exit 1; }; done
+for f in js/*.js sw.js; do node --check "$f"; done
+python3 -m json.tool manifest.webmanifest >/dev/null
+python3 - <<'PY'
+from pathlib import Path
+import re
+h=Path('index.html').read_text()
+ids=re.findall(r'\bid="([^"]+)"',h)
+d=sorted({x for x in ids if ids.count(x)>1})
+assert not d, f'IDs duplicados: {d}'
+css=Path('css/app.css').read_text(); ui=Path('js/ui.js').read_text(); ctr=Path('js/controllers.js').read_text(); store=Path('js/store.js').read_text(); cloud=Path('js/cloud.js').read_text()
 assert 'grid-template-columns:repeat(3,minmax(0,1fr))' in css
-assert 'touch-action:pan-y' in css
-assert 'font-size:16px' in css
-cloud=(r/'js/cloud.js').read_text()
+assert 'scroll-snap-type:y mandatory' in css
+assert "pull:'clone'" in ui and 'new Sortable' in ui
+assert 'FeedControllerHub' in ctr and 'keyedSync' in ctr
+assert 'innerHTML=renderFeed' not in ui
 assert "WORKSPACE='editorial-os'" in cloud
-assert 'mergePayload' in cloud
-print('Editorial Emulator V1 QA: OK')
+assert "K_APP='jocEditorialV9AppData'" in store
+assert "K_SC='jocEditorialV9Scenarios'" in store
+assert "currentScenarioId" in store and 'createScenario' in store
+assert "store.subscribe('planner'" in ui and "store.subscribe('feeds'" in ui
+print('Editorial Emulator V2 QA estática: OK')
 PY
+grep -q "editorial-emulator-v2" sw.js
+grep -q "Editorial Emulator V2" manifest.webmanifest
+bash -n create_and_publish.sh
+printf '\nQA V2: OK\n'

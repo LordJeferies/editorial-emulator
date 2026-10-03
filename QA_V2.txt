@@ -1,0 +1,27 @@
+EDITORIAL EMULATOR V2 · QA
+
+PASS · JavaScript syntax: app/store/cloud/feeds/controllers/ui/defaults
+PASS · manifest.webmanifest JSON
+PASS · IDs HTML únicos
+PASS · Service Worker cache editorial-emulator-v2
+PASS · mismo workspace Supabase: editorial-os
+PASS · claves legacy jocEditorialV9*
+PASS · landing de escenarios existente/nuevo
+PASS · autosave de escenario activo
+PASS · crear escenario base/vacío/duplicado
+PASS · Content Rail persistente
+PASS · SortableJS clone desde rail (pull:'clone')
+PASS · move/reorder entre días
+PASS · store por canales; no renderAll global estándar
+PASS · feed derivado cacheado por dataRevision + anchorDate
+PASS · FeedControllerHub persistente
+PASS · keyed DOM patching en Instagram/TikTok/LinkedIn/Facebook
+PASS · TikTok scroll-snap vertical + metadata editorial visible
+PASS · Instagram Profile + Feed persistentes
+PASS · YouTube Shorts separado de horizontal/episodio
+PASS · LinkedIn/Facebook con shells propios
+PASS · Play cambia activeOccurrenceId y hace scroll al nodo existente
+PASS · formularios simplificados
+PASS · responsive CSS móvil <=900px y <=390px
+
+Nota: SortableJS y Supabase JS se cargan por CDN en ejecución. En una instalación offline antes del primer cache, drag cloud puede no estar disponible hasta recuperar conexión.

@@ -1,5 +1,5 @@
 cd ~/Downloads
-unzip -o EDITORIAL_EMULATOR_V1_PWA.zip
-cd EDITORIAL_EMULATOR_V1_PWA
+unzip -o EDITORIAL_EMULATOR_V2_PWA.zip
+cd EDITORIAL_EMULATOR_V2_PWA
 chmod +x create_and_publish.sh validate.sh
 ./create_and_publish.sh
