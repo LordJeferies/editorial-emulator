@@ -1,6 +1,6 @@
-const CACHE='editorial-emulator-v3-0-docs';
-const CORE=['./','./index.html','./help.html','./product.html','./css/system-v27.css','./css/system-v28.css','./css/system-v29.css','./css/system-v30.css','./js/runtime-v27.js','./js/ux-v28.js','./js/liquidglass-v28.js','./js/cloud-bridge-v29.js','./js/bootstrap-v30.js','./js/planner-v30.js','./manifest.webmanifest','./icons/icon.svg','./supabase-config.js'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
+const CACHE='editorial-emulator-v3-1-mcp';
+const CORE=['./','./index.html','./help.html','./product.html','./mcp.html','./css/system-v27.css','./css/system-v28.css','./css/system-v29.css','./css/system-v30.css','./css/system-v31.css','./js/runtime-v27.js','./js/ux-v28.js','./js/liquidglass-v28.js','./js/cloud-bridge-v29.js','./js/bootstrap-v31.js','./js/planner-v30.js','./js/mcp-ui-v31.js','./manifest.webmanifest','./icons/icon.svg','./supabase-config.js'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('editorial-emulator-')&&k!==CACHE)await caches.delete(k);await self.clients.claim()})()));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==location.origin)return;const code=e.request.mode==='navigate'||/\.(html|css|js|webmanifest)$/.test(u.pathname)||u.pathname.endsWith('/');e.respondWith(code?networkFirst(e.request):cacheFirst(e.request))});
 async function networkFirst(r){const c=await caches.open(CACHE);try{const x=await fetch(r,{cache:'no-store'});if(x.ok)c.put(r,x.clone());return x}catch{return(await c.match(r))||(r.mode==='navigate'?c.match('./index.html'):Response.error())}}
