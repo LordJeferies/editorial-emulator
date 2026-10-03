@@ -1,5 +1,50 @@
-cd ~/Downloads
-unzip -o EDITORIAL_EMULATOR_V2_PWA.zip
-cd EDITORIAL_EMULATOR_V2_PWA
-chmod +x create_and_publish.sh validate.sh
-./create_and_publish.sh
+EDITORIAL EMULATOR V3.2 · ACTUALIZAR + MCP
+==========================================
+
+1) ACTUALIZAR REPO LOCAL
+
+cd "$HOME/Downloads/editorial-emulator"
+git stash push -u -m "backup-auto-$(date +%Y%m%d-%H%M%S)" || true
+git config core.fileMode false
+git fetch origin
+git checkout main
+git reset --hard origin/main
+
+2) INSTALAR / VALIDAR MCP
+
+cd "$HOME/Downloads/editorial-emulator/mcp"
+chmod +x install.sh
+./install.sh
+
+3) VARIABLES QUE DEBES CONFIGURAR EN TU CLIENTE MCP
+
+EDITORIAL_SUPABASE_EMAIL=TU_EMAIL
+EDITORIAL_SUPABASE_PASSWORD=TU_PASSWORD
+EDITORIAL_WORKSPACE=editorial-os
+
+La URL y la anon/public key se leen automáticamente desde:
+$HOME/Downloads/editorial-emulator/supabase-config.js
+
+NO uses ni guardes en el repo:
+- service_role
+- database password
+- secret keys
+- GitHub PAT
+
+4) ABRIR APP DESKTOP
+
+open "/Applications/Editorial Emulator.app"
+
+5) LINKS
+
+App:
+https://lordjeferies.github.io/editorial-emulator/?v=32
+
+Producto:
+https://lordjeferies.github.io/editorial-emulator/product.html?v=32
+
+MCP:
+https://lordjeferies.github.io/editorial-emulator/mcp.html?v=32
+
+Repo:
+https://github.com/LordJeferies/editorial-emulator
