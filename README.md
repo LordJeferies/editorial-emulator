@@ -1,70 +1,13 @@
-# Editorial Emulator V2
+# Editorial Emulator V2.4
 
-Aplicación separada de Editorial OS enfocada exclusivamente en **crear escenarios, organizar contenido por drag & drop, reproducir una simulación y revisar feeds realistas**.
+Aplicación separada de Editorial OS enfocada exclusivamente en **crear escenarios, organizar contenido, reproducir una simulación y revisar feeds persistentes**.
 
-## Cambios principales frente a V1
+## Arquitectura V2.4
 
-### Escenarios primero
-Al abrir la app eliges:
-- usar un escenario existente;
-- continuar el último;
-- crear uno nuevo;
-- partir de Base JOC, semana vacía o duplicar otro escenario.
+### Local-first
+La UI no depende de Supabase para arrancar. Crear escenarios, añadir/mover contenido, Play y Feeds funcionan con el estado local inmediatamente. Supabase es la capa de sincronización y se inicia después de que la interfaz ya está operativa.
 
-Todo escenario se autosalva. No depende de acordarse de pulsar “Guardar”.
-
-### Content Rail siempre visible
-La bandeja de contenidos permanece accesible en Plan. Se puede:
-- buscar;
-- filtrar L1/L2/L3;
-- expandir;
-- crear contenido;
-- arrastrar fichas a cualquier día.
-
-SortableJS usa `pull:'clone'` desde el rail y move/reorder entre días, con delay táctil para iPhone.
-
-### Feeds persistentes
-Instagram, TikTok, LinkedIn, YouTube y Facebook se montan una sola vez. Cambiar de plataforma no destruye el shell de las otras apps.
-
-Los controllers actualizan nodos por `occurrenceId`; no se hace `phone.innerHTML = renderFeed()` al cambiar de pestaña.
-
-### TikTok mejorado
-- scroll-snap vertical;
-- cada publicación muestra título/caption, tipo, fecha y L1/L2/L3;
-- botones laterales simulados;
-- barra superior y bottom nav;
-- IntersectionObserver actualiza la publicación activa.
-
-### Instagram
-- Perfil y Feed son dos superficies persistentes;
-- grid de 3 columnas;
-- feed vertical con caption y metadata visual;
-- mantiene estado al cambiar de plataforma.
-
-### YouTube
-Los contenidos se separan en:
-- Shorts/verticales;
-- videos y episodios horizontales.
-
-### LinkedIn y Facebook
-Cada uno tiene chrome y cards propios. Ya no comparten un único “social-card” genérico.
-
-### Play
-Play cambia `activeOccurrenceId`, activa la plataforma correspondiente y hace scroll al post existente. No reconstruye todo el simulador.
-
-## Rendimiento
-
-- store por canales: `planner`, `feeds`, `catalog`, `library`, `cloud`, `scenario`;
-- no existe un `renderAll()` como reacción estándar a cada persistencia;
-- feed derivado cacheado por `dataRevision + anchorDate`;
-- controllers persistentes;
-- keyed DOM patching para Instagram/TikTok/LinkedIn/Facebook;
-- TikTok limita el primer render si supera 50 publicaciones;
-- Supabase sincroniza en background con debounce.
-
-## Datos compartidos
-
-Conserva los contratos de Editorial OS:
+Contratos compartidos:
 - `jocEditorialV9`
 - `jocEditorialV9AppData`
 - `jocEditorialV9Scenarios`
@@ -73,15 +16,66 @@ Conserva los contratos de Editorial OS:
 - `workspace_key = editorial-os`
 - payload compatible `version: 9`
 
-Si ambos Pages están bajo `lordjeferies.github.io`, además comparten origin/localStorage.
+El repo ya contiene `supabase-config.js` con la configuración pública del mismo proyecto. Si existe una sesión Supabase válida para `lordjeferies.github.io`, se reutiliza automáticamente.
 
-## Publicar
+### Escenarios primero
+Al abrir la app puedes:
+- continuar el último escenario;
+- usar uno guardado;
+- crear uno nuevo;
+- partir de Base JOC, semana vacía o duplicar otro escenario.
 
-```bash
-chmod +x create_and_publish.sh validate.sh
-./create_and_publish.sh
-```
+Los escenarios se autosalvan.
 
-Por defecto crea o actualiza:
-- `LordJeferies/editorial-emulator`
-- `https://lordjeferies.github.io/editorial-emulator/`
+### Content Rail persistente
+La bandeja de contenidos permanece visible en Plan:
+- buscar;
+- filtrar L1/L2/L3;
+- expandir;
+- crear contenido;
+- arrastrar a un día;
+- tocar una ficha para añadirla al día activo como fallback touch.
+
+SortableJS usa clone desde el rail y move/reorder entre días. Si Sortable no carga, el fallback por tap y los menús siguen funcionando.
+
+### Feeds persistentes
+Instagram, TikTok, LinkedIn, YouTube y Facebook permanecen montados. Cambiar de plataforma no destruye los otros shells. Los controllers sincronizan por `occurrenceId` y Play activa posts existentes.
+
+### Rendimiento
+- store por canales (`planner`, `feeds`, `catalog`, `library`, `cloud`, `scenario`);
+- feed derivado cacheado por revisión;
+- controllers persistentes;
+- keyed DOM patching en los principales feeds;
+- sincronización cloud con debounce;
+- Service Worker network-first para código de la app;
+- boot V2.4 sin purge de cache en cada apertura;
+- interfaz inicializada antes que Supabase.
+
+## UX / Design System
+
+V2.4 añade tokens centralizados de spacing, radios, controles, motion, superficies, texto, borders, estados y materiales. Glass queda reservado a navegación, rail y overlays, no a cada contenido. Los controles táctiles importantes parten de 44 CSS px y se respetan safe areas.
+
+También incorpora:
+- feedback pressed/focus/selected;
+- estados empty/error/success;
+- toasts de acciones;
+- indicadores Guardado/Sincronizando/Offline;
+- `Cmd/Ctrl+K` búsqueda;
+- `Cmd/Ctrl+N` crear;
+- `Esc` cerrar sheets/visor;
+- reduced motion / reduced transparency.
+
+## PWA
+
+- display standalone;
+- safe areas;
+- cache versionado `editorial-emulator-v2-4`;
+- HTML/CSS/JS en network-first;
+- fallback offline desde cache;
+- scope separado `./`.
+
+## URL
+
+- Repo: `https://github.com/LordJeferies/editorial-emulator`
+- Page: `https://lordjeferies.github.io/editorial-emulator/`
+- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html`
