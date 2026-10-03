@@ -1,8 +1,8 @@
 {
   "id":"./",
-  "name":"Editorial Emulator V2",
+  "name":"Editorial Emulator V2.4",
   "short_name":"Emulator",
-  "description":"Emulador editorial persistente para escenarios, drag & drop y simulación realista de feeds.",
+  "description":"Emulador editorial local-first para escenarios, drag & drop y simulación persistente de feeds, sincronizado con Editorial OS cuando Supabase está disponible.",
   "start_url":"./",
   "scope":"./",
   "display":"standalone",
