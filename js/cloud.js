@@ -44,7 +44,7 @@ function mergePayload(remote,owned){
   r.savedScenarios=mergeById(r.savedScenarios||[],owned.savedScenarios||[]);
   const prev=Number(r.syncMeta?.revision||0),deviceId=localStorage.getItem('editorialEmulatorDeviceId')||uid();
   localStorage.setItem('editorialEmulatorDeviceId',deviceId);
-  r.syncMeta={...(r.syncMeta||{}),revision:prev+1,baseRevision:prev,deviceId,productVersion:'emulator-2.4',updatedAt:new Date().toISOString()};
+  r.syncMeta={...(r.syncMeta||{}),revision:prev+1,baseRevision:prev,deviceId,productVersion:'emulator-2.5',updatedAt:new Date().toISOString()};
   return r;
 }
 async function session(){
