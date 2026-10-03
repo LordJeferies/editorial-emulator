@@ -1,42 +1,48 @@
 # Editorial Emulator
 
-## V2.4 · estabilidad local-first y pulido UI/UX
+## V2.5 · reparación funcional + rediseño responsive
 
-### Reparación crítica
-- Se reemplaza el módulo UI V2.3 que provocaba el error de parsing `Unexpected token '}'` antes de que los botones pudieran enlazarse.
-- Nuevo `ui-v24.js` verificado sintácticamente.
-- Nuevo `boot-v24.js`: inicializa la interfaz primero y Supabase después, sin bloquear el uso.
-- Se elimina el purge/warm de todos los caches en cada arranque.
-- Service Worker `editorial-emulator-v2-4`, network-first para código y cache offline como fallback.
+### P0 reparado
+- Se confirmó la causa real de los botones muertos de la landing: `ui-v24.js` tenía una llave `}` extra al cerrar `scenarioCreate()`, por lo que el módulo fallaba al parsear antes de ejecutar `initUI()`.
+- La landing podía dibujarse porque era HTML estático, pero ningún handler llegaba a enlazarse.
+- V2.5 deja de cargar `ui-v24.js`.
+- Nuevo `ui-v25.js` validado con `node --check`.
+- Nuevo `boot-v25.js` validado con `node --check`.
+- `boot-v24.js` queda sólo como compatibilidad y redirige a V2.5.
 
-### Local-first / Supabase
-- `supabase-config.js` sigue preconfigurado con el mismo proyecto de Editorial OS.
-- Abrir, crear y editar escenarios no requieren red.
-- La sesión Supabase existente del mismo origin se reutiliza automáticamente si está disponible.
-- Sync conserva `workspace_key = editorial-os` y payload compatible `version: 9`.
-- Login manual queda como opción avanzada, no como requisito de uso.
+### Arranque local-first
+- La UI se inicializa antes de Supabase.
+- Abrir/crear escenarios no depende de red, sesión ni SDK cloud.
+- El módulo cloud se importa bajo demanda y sus fallos no bloquean el workspace.
+- La landing actualiza inmediatamente a V2.5 y muestra un error visible si el bootstrap falla.
 
-### Interacción
-- Startup funcional: continuar, usar existente y crear nuevo.
-- Content Rail con drag & drop y fallback por tap.
-- Feedback inmediato para drop, crear, mover, eliminar y duplicar.
-- Confirmación al quitar una pieza del plan.
-- Empty states en planner, biblioteca y escenarios.
-- Keyboard: Cmd/Ctrl+K, Cmd/Ctrl+N y Escape.
+### Escenarios
+- “Usar escenario existente” abre un selector visual en grid.
+- “Crear escenario nuevo” abre Base JOC / semana vacía / duplicar escenario.
+- Crear entra directamente al workspace y se autosalva localmente.
+- El selector ofrece acceso directo a crear un escenario si aún no existe ninguno.
 
-### Design system
-- Tokens de spacing, radius, controles, motion, surfaces, borders, semantic colors y shadows.
-- Touch targets principales de 44 CSS px.
-- Focus visible y pressed feedback.
-- Safe areas móviles.
-- Glass limitado a navegación/floating UI/sheets.
-- `prefers-reduced-motion` y `prefers-reduced-transparency`.
+### Frontend V2.5
+- Nuevo sistema visual `system-v25.css`.
+- Desktop: navegación lateral compacta + workspace amplio.
+- Mobile/tablet: workspace de una columna + bottom navigation.
+- Content Rail sticky y visible, expandible, con drag/tap fallback.
+- Drop targets con feedback más claro.
+- Cards, sheets, formularios e inspector de feeds con mayor jerarquía.
+- Responsive por CSS logical pixels, safe areas y `100dvh`.
+- Inputs >=16px y targets principales >=44px.
+- `content-visibility` para tarjetas largas de feeds.
+- reduced motion.
 
-### Ayuda
-- Guía interna actualizada a V2.4.
-- Explicación por escenarios de uso.
-- Flujo completo Plan → Play → Feeds → ajustes.
-- Explicación explícita de autosave local y sincronización cloud.
+### PWA/cache
+- Cache `editorial-emulator-v2-5`.
+- HTML/CSS/JS/manifest en network-first.
+- Se eliminan caches `editorial-emulator-*` anteriores al activar V2.5.
+- `start_url` y shortcuts usan `?v=25`.
+
+## V2.4 · intento de recuperación con regresión de parsing
+
+V2.4 introdujo mejoras de diseño y local-first, pero la versión publicada de `ui-v24.js` contenía un error de sintaxis en `scenarioCreate()`. Por ello la landing se veía correctamente pero los botones no podían enlazarse. V2.5 sustituye ese runtime completo.
 
 ## V2
 
