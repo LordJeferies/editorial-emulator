@@ -1,74 +1,59 @@
-# Editorial Emulator V2.9
+# Editorial Emulator V3.2
 
-Aplicación separada de Editorial OS enfocada en **escenarios, planificación visual, Play y simulación de feeds**, disponible como PWA y como app Desktop para macOS.
+Editorial Emulator es una app separada de Editorial OS enfocada en **escenarios, planificación visual, simulación de feeds y automatización mediante MCP**.
+
+## URLs
+
+- App / PWA: `https://lordjeferies.github.io/editorial-emulator/?v=32`
+- Producto: `https://lordjeferies.github.io/editorial-emulator/product.html?v=32`
+- Guía MCP: `https://lordjeferies.github.io/editorial-emulator/mcp.html?v=32`
+- Repo: `https://github.com/LordJeferies/editorial-emulator`
+- Desktop Mac: `https://github.com/LordJeferies/editorial-emulator/releases/download/desktop-latest/Editorial-Emulator-macOS.zip`
 
 ## Arquitectura canónica
 
-La aplicación principal sigue siendo la versión pública de GitHub Pages:
+```text
+GitHub Pages = aplicación canónica
+        ↓
+Web / PWA / Desktop Mac
+        ↓
+Supabase compartido
+        ↑
+Editorial Emulator MCP
+```
 
-`https://lordjeferies.github.io/editorial-emulator/`
+La app Desktop es un wrapper AppKit + WKWebView que abre la URL pública. Los cambios del frontend publicados en GitHub Pages llegan sin reinstalar la `.app`.
 
-Todas las superficies cliente apuntan a la misma aplicación:
+## Planificador
 
-- navegador;
-- PWA instalada;
-- Safari Web App;
-- `Editorial Emulator.app` para macOS.
+Tres vistas editan exactamente el mismo estado:
 
-La app Desktop no contiene una segunda copia del frontend. Es un wrapper nativo AppKit + WKWebView que carga la URL canónica. Por eso los cambios publicados en GitHub Pages aparecen en Desktop sin reinstalar el `.app`.
+- **Board** — estilo Kanban/Trello;
+- **Timeline** — semana compacta;
+- **Agenda** — lista precisa por día.
 
-Supabase sigue siendo el backend compartido y la UI conserva el modelo local-first.
+Funciones:
 
-## Descargar para Mac
-
-La landing pública incluye **Descargar para Mac**.
-
-Asset estable:
-
-`https://github.com/LordJeferies/editorial-emulator/releases/download/desktop-latest/Editorial-Emulator-macOS.zip`
-
-Requisitos:
-
-- macOS 13+;
-- Apple Silicon o Intel según la arquitectura en la que se construya el ZIP;
-- el build público actual usa firma ad-hoc, no Developer ID/notarización.
-
-Para tu Mac local, la forma recomendada es construir e instalar desde el repo con `desktop/mac/build-release.sh`.
-
-## Construcción Desktop
-
-Archivos:
-
-- `desktop/mac/App.swift` — ventana AppKit + WKWebView persistente;
-- `desktop/mac/Info.plist` — bundle macOS;
-- `desktop/mac/build.sh` — compila, genera icono cuando Quick Look puede renderizar el SVG, firma ad-hoc y crea ZIP;
-- `desktop/mac/install.sh` — instala en `/Applications` y crea alias en el Escritorio;
-- `desktop/mac/build-release.sh` — build + instalación opcional + publicación opcional en GitHub Release;
-- `.github/workflows/desktop-macos.yml` — genera y actualiza automáticamente el asset estable `desktop-latest`.
-
-La ventana Desktop conserva almacenamiento WebKit persistente y abre enlaces externos fuera de la aplicación. Los enlaces del propio `lordjeferies.github.io` permanecen dentro de la app.
-
-## Plan
-
-- Content Rail visible;
-- añadir por tap o drag;
-- mover entre días;
-- subir/bajar una pieza;
+- drag & drop con Pointer Events;
+- long-press en móvil;
+- `Añadir a...` como alternativa al drag;
+- `+ Añadir` desde cada día;
+- mover y reordenar piezas;
 - Undo / Redo;
-- atajos `Cmd/Ctrl+Z`, `Shift+Cmd/Ctrl+Z`, `Cmd/Ctrl+Y`;
 - Borrar todo con confirmación;
-- Undo restaura inmediatamente un plan vaciado;
 - duplicar escenario;
 - autosave local-first.
 
+Cambiar entre Board, Timeline y Agenda **no duplica ni borra datos**.
+
 ## Feeds
 
-Selector de dispositivo:
+Dispositivos:
 
 - Mobile;
 - Desktop.
 
-Modos por plataforma:
+Plataformas:
 
 - Instagram: Grid / Feed / Reels;
 - TikTok: Grid / Feed vertical;
@@ -76,51 +61,141 @@ Modos por plataforma:
 - YouTube: Grid / Videos / Player;
 - Facebook: Grid / Feed.
 
-La vista Desktop usa un mockup ancho con browser chrome y grillas mayores. La vista Mobile conserva el mockup de teléfono. El escenario es el mismo: cambiar de dispositivo o modo no duplica los datos.
+## Welcome + progreso
 
-## Productividad
+V3.2 añade:
 
-- `Cmd/Ctrl+K`: Acciones rápidas;
-- `Cmd/Ctrl+N`: nuevo contenido;
-- `/`: buscar contenido;
-- `1 / 2 / 3`: Plan / Feeds / Biblioteca;
-- `Space`: Play/Stop;
-- `?`: ayuda.
+- pantalla de bienvenida;
+- opción de no mostrarla cada vez;
+- barra superior de progreso con porcentaje;
+- mensaje de qué está haciendo la app;
+- operaciones normales siguen siendo no bloqueantes;
+- sólo aparece un overlay bloqueante cuando una operación realmente necesita terminar antes de continuar;
+- el sistema de progreso se expone como `window.EDITORIAL_PROGRESS` para nuevos módulos.
 
-## Local-first
+API interna:
 
-La app no necesita Supabase para abrir, crear escenarios, editar el plan, usar Undo/Redo o revisar los feeds.
+```js
+const job = window.EDITORIAL_PROGRESS.start('Procesando...');
+job.update(50, 'Mitad del proceso...');
+job.finish('Listo');
+```
 
-Orden:
+Para una operación que sí debe bloquear:
 
-1. cargar estado local;
-2. montar UI;
-3. enlazar controles;
-4. guardar localmente cada cambio;
-5. sincronizar Supabase después.
+```js
+const job = window.EDITORIAL_PROGRESS.start('Guardando...', {
+  blocking: true,
+  blockMessage: 'Espera a que termine este guardado antes de continuar.'
+});
+```
 
-Contratos preservados:
+## Supabase
 
-- `jocEditorialV9AppData`
-- `jocEditorialV9Scenarios`
-- `editorialEmulatorV2CurrentScenario`
-- `editorialEmulatorV2Draft`
-- tabla `public.editorial_state`
-- `workspace_key = editorial-os`
-- payload compatible `version: 9`
+La app trabaja local-first y sincroniza después.
+
+Contratos compartidos:
+
+- tabla `public.editorial_state`;
+- `workspace_key = editorial-os`;
+- payload `version: 9`;
+- `jocEditorialV9AppData`;
+- `jocEditorialV9Scenarios`;
+- `editorialEmulatorV2CurrentScenario`;
+- `editorialEmulatorV2Draft`.
+
+El frontend usa la anon/public key configurada en `supabase-config.js`. Nunca se debe poner `service_role`, database password o secret keys en el cliente.
+
+## MCP
+
+Carpeta:
+
+```text
+mcp/
+├── server.mjs
+├── package.json
+├── install.sh
+├── .env.example
+├── README.md
+├── CRITERIA.md
+└── EXAMPLES.md
+```
+
+El MCP opera sobre el mismo Supabase que usa la app. No automatiza clicks; modifica directamente la fuente de datos compartida.
+
+### Instalación
+
+```bash
+cd ~/Downloads/editorial-emulator/mcp
+chmod +x install.sh
+./install.sh
+```
+
+Necesita Node.js 20+.
+
+### Credenciales
+
+Configura en el cliente MCP:
+
+```text
+EDITORIAL_SUPABASE_EMAIL
+EDITORIAL_SUPABASE_PASSWORD
+EDITORIAL_WORKSPACE=editorial-os
+```
+
+La URL y la anon key se leen de `supabase-config.js`.
+
+### Capacidades
+
+- listar/crear/duplicar/renombrar/eliminar escenarios;
+- leer y editar planes;
+- añadir/mover/reordenar/eliminar piezas;
+- aplicar batches;
+- crear y editar contenido personalizado;
+- gestionar marcas/pilares/familias;
+- derivar feeds por plataforma;
+- validar integridad;
+- backups automáticos;
+- restauración de backups.
+
+Cada mutación MCP guarda automáticamente un backup del payload anterior. Se conservan los últimos 8.
+
+## Desktop macOS
+
+Archivos:
+
+- `desktop/mac/App.swift`
+- `desktop/mac/Info.plist`
+- `desktop/mac/build.sh`
+- `desktop/mac/install.sh`
+- `desktop/mac/build-release.sh`
+- `.github/workflows/desktop-macos.yml`
+
+Build local:
+
+```bash
+cd ~/Downloads/editorial-emulator
+chmod +x desktop/mac/*.sh
+desktop/mac/build-release.sh --install --publish
+```
 
 ## PWA
 
-- Service Worker `editorial-emulator-v2-9`;
-- HTML/CSS/JS en network-first;
-- caches `editorial-emulator-*` anteriores se eliminan al activar una build nueva;
 - `display: standalone`;
 - safe areas;
-- fallback offline.
+- offline fallback;
+- HTML/CSS/JS network-first;
+- cache actual: `editorial-emulator-v3-2-mcp-progress`;
+- caches anteriores `editorial-emulator-*` se eliminan al activar una versión nueva.
 
-## URLs
+## Seguridad
 
-- Repo: `https://github.com/LordJeferies/editorial-emulator`
-- Page: `https://lordjeferies.github.io/editorial-emulator/?v=29`
-- Guía: `https://lordjeferies.github.io/editorial-emulator/help.html?v=29`
-- Desktop Mac: `https://github.com/LordJeferies/editorial-emulator/releases/download/desktop-latest/Editorial-Emulator-macOS.zip`
+No subir al repo:
+
+- contraseñas;
+- `service_role`;
+- database password;
+- secret keys;
+- GitHub PAT.
+
+El MCP usa la anon/public key + login real del usuario de Supabase.
