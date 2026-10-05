@@ -1,0 +1,23 @@
+(()=>{'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const K_SC='jocEditorialV9Scenarios',K_CURRENT='editorialEmulatorV2CurrentScenario';
+const DN={0:'Domingo',1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado'};
+let scheduled=0,applying=false;
+function parse(v,f){try{return JSON.parse(v)??f}catch{return f}}
+function current(){const id=localStorage.getItem(K_CURRENT)||'',all=parse(localStorage.getItem(K_SC),[]);return {id,all,scenario:all.find(x=>x?.id===id)||null}}
+function isoDate(value){if(/^\d{4}-\d{2}-\d{2}$/.test(String(value||'')))return String(value);return new Date().toISOString().slice(0,10)}
+function localDate(iso){return new Date(`${iso}T12:00:00`)}
+function addDays(iso,n){const d=localDate(iso);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
+function cycle(){const sc=current().scenario,start=isoDate(sc?.range?.start);const startDow=localDate(start).getDay();const order=Array.from({length:7},(_,i)=>(startDow+i)%7);const dates=Object.fromEntries(order.map((dow,i)=>[dow,addDays(start,i)]));return {start,startDow,order,dates,end:addDays(start,6)}}
+function fmt(iso){const d=localDate(iso);return d.toLocaleDateString('es-ES',{day:'numeric',month:'short'}).replace('.','')}
+function mountControl(){const root=$('#plannerV30');if(!root||$('#v33CycleControl'))return;const head=$('.v30-planner-head',root);if(!head)return;const c=cycle();const box=document.createElement('div');box.id='v33CycleControl';box.className='v33-cycle-control';box.innerHTML=`<label><span>Primer día del ciclo</span><input id="v33CycleStart" type="date" value="${c.start}"></label><div class="v33-cycle-summary"><b>${DN[c.startDow]}</b><small>${fmt(c.start)} → ${fmt(c.end)} · 7 días</small></div>`;head.appendChild(box);$('#v33CycleStart',box).addEventListener('change',e=>setStart(e.target.value))}
+function setStart(start){if(!/^\d{4}-\d{2}-\d{2}$/.test(start))return;const data=current();if(!data.scenario)return;data.scenario.range=data.scenario.range||{};data.scenario.range.start=start;data.scenario.range.end=addDays(start,6);data.scenario.updatedAt=new Date().toISOString();data.scenario.revision=(data.scenario.revision||0)+1;localStorage.setItem(K_SC,JSON.stringify(data.all));const p=window.EDITORIAL_PROGRESS?.start?.({label:'Actualizando ciclo editorial',blocking:false,detail:'Reordenando los 7 días…'});window.EDITORIAL_PROGRESS?.update?.(p,70,'Guardando fecha inicial…');setTimeout(()=>{window.EDITORIAL_PROGRESS?.finish?.(p,'Ciclo actualizado');location.reload()},280)}
+function reorderSurface(){const surface=$('#v30Surface');if(!surface)return;const c=cycle();const container=surface.firstElementChild;if(!container)return;const nodes=$$('[data-drop-day]',container);if(nodes.length!==7)return;const by=new Map(nodes.map(n=>[Number(n.dataset.dropDay),n]));c.order.forEach(d=>{const n=by.get(d);if(n)container.appendChild(n)});decorateDays(c)}
+function decorateDays(c){$$('#v30Surface [data-drop-day]').forEach(sec=>{const d=Number(sec.dataset.dropDay),date=c.dates[d];if(!date)return;let tag=$('.v33-date',sec);if(!tag){tag=document.createElement('span');tag.className='v33-date';const header=$('header',sec);const holder=header?.querySelector('div')||header;if(holder)holder.appendChild(tag)}tag.textContent=fmt(date);sec.dataset.cycleDate=date;sec.classList.toggle('v33-cycle-first',d===c.startDow)});const summary=$('.v33-cycle-summary');if(summary){summary.innerHTML=`<b>${DN[c.startDow]}</b><small>${fmt(c.start)} → ${fmt(c.end)} · 7 días</small>`}}
+function reorderPicker(){const picker=$('#v30Picker .v30-picker-days');if(!picker)return;const c=cycle(),buttons=$$('[data-pick-day]',picker),by=new Map(buttons.map(b=>[Number(b.dataset.pickDay),b]));c.order.forEach(d=>{const b=by.get(d);if(!b)return;const date=c.dates[d];const label=b.querySelector('b');if(label)label.textContent=`${DN[d]} · ${fmt(date)}`;picker.appendChild(b)})}
+function refresh(){if(applying)return;applying=true;try{mountControl();reorderSurface();reorderPicker();const root=$('#plannerV30');if(root){root.dataset.cycleStart=cycle().start;root.dataset.cycleFirst=String(cycle().startDow)}}finally{applying=false}}
+function schedule(){cancelAnimationFrame(scheduled);scheduled=requestAnimationFrame(refresh)}
+function boot(){schedule();new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});window.addEventListener('storage',e=>{if(e.key===K_SC||e.key===K_CURRENT)schedule()});document.documentElement.dataset.flexibleWeek='v33'}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+window.EDITORIAL_FLEX_WEEK={refresh,setStart,cycle};
+})();
