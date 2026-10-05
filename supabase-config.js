@@ -4,10 +4,10 @@ window.EDITORIAL_SUPABASE = {
 };
 
 (()=>{
-  if (document.querySelector('script[data-editorial-bootstrap="v34"]')) return;
+  if (document.querySelector('script[data-editorial-bootstrap="v35"]')) return;
   const s = document.createElement('script');
-  s.src = './js/bootstrap-v34.js?v=34';
+  s.src = './js/bootstrap-v35.js?v=35';
   s.defer = true;
-  s.dataset.editorialBootstrap = 'v34';
+  s.dataset.editorialBootstrap = 'v35';
   document.head.appendChild(s);
 })();
