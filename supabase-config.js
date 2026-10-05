@@ -4,9 +4,9 @@ window.EDITORIAL_SUPABASE = {
 };
 
 (()=>{
-  if (document.querySelector('script[data-editorial-bootstrap="v38"]')) return;
+  if (document.querySelector('script[data-editorial-bootstrap="v39"]')) return;
   const s = document.createElement('script');
-  s.src = './js/bootstrap-v38.js?v=38';
+  s.src = './js/bootstrap-v39.js?v=39';
   s.defer = true;
   s.dataset.editorialBootstrap = 'v38';
   document.head.appendChild(s);
