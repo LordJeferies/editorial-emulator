@@ -1,0 +1,8 @@
+(()=>{'use strict';
+function css(href,key){if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='1';document.head.appendChild(l)}
+function script(src,key){if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement('script');s.src=src;s.defer=true;s.dataset[key]='1';document.head.appendChild(s)}
+function patchVersionedLinks(){const manifest=document.querySelector('link[rel="manifest"]');if(manifest)manifest.href='./manifest.webmanifest?v=34';document.querySelectorAll('a[href]').forEach(a=>{let h=a.getAttribute('href')||'';h=h.replace(/\?v=(29|30|31|32|33)/g,'?v=34');a.setAttribute('href',h)})}
+async function registerSW(){if(!('serviceWorker' in navigator))return;try{const reg=await navigator.serviceWorker.register('./sw.js?v=34',{scope:'./'});reg.update?.()}catch(e){console.info('Service Worker no disponible; la app continúa online.',e)}}
+function boot(){css('./css/system-v30.css?v=34','editorialV30');css('./css/system-v31.css?v=34','editorialV31');css('./css/system-v32.css?v=34','editorialV32');css('./css/system-v33.css?v=34','editorialV33');script('./js/progress-v32.js?v=34','editorialProgressV32');script('./js/planner-v30.js?v=34','editorialPlannerV30');script('./js/mcp-ui-v31.js?v=34','editorialMcpV31');script('./js/activity-v32.js?v=34','editorialActivityV32');script('./js/flexible-week-v33.js?v=34','editorialFlexibleWeekV33');patchVersionedLinks();registerSW();document.documentElement.dataset.editorialVersion='3.4'}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
