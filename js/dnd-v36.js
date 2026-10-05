@@ -1,0 +1,51 @@
+(()=>{'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const SORTABLE_URL='https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js';
+const K_SC='jocEditorialV9Scenarios',K_CURRENT='editorialEmulatorV2CurrentScenario';
+const DN={0:'Domingo',1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado'};
+let instances=[],ready=false,dragging=false,rebuildTimer=0,observer=null;
+const coarse=()=>matchMedia?.('(pointer: coarse)')?.matches||('ontouchstart'in window);
+const reduced=()=>matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const parse=(v,f)=>{try{return JSON.parse(v)??f}catch{return f}};
+const cssEsc=s=>globalThis.CSS?.escape?CSS.escape(String(s)):String(s).replace(/(["'\\.#:[\]()>+~*])/g,'\\$1');
+function toast(text){const r=$('#toastRegion');if(!r)return;const n=document.createElement('div');n.className='toast';n.textContent=text;r.append(n);setTimeout(()=>n.remove(),1800)}
+function loadSortable(){return new Promise((resolve,reject)=>{if(window.Sortable)return resolve(window.Sortable);const old=document.querySelector('script[data-sortable-v36]');if(old){old.addEventListener('load',()=>resolve(window.Sortable),{once:true});old.addEventListener('error',reject,{once:true});return}const s=document.createElement('script');s.src=SORTABLE_URL;s.async=true;s.crossOrigin='anonymous';s.dataset.sortableV36='1';s.onload=()=>window.Sortable?resolve(window.Sortable):reject(new Error('Sortable no disponible'));s.onerror=reject;document.head.appendChild(s)})}
+function dayOf(el){return Number(el?.closest?.('[data-drop-day]')?.dataset.dropDay)}
+function currentScenario(){const id=localStorage.getItem(K_CURRENT)||'',all=parse(localStorage.getItem(K_SC),[]);return all.find(x=>x?.id===id)||null}
+function dayItems(day){const s=currentScenario()?.slots||{};return Array.isArray(s?.[day])?s[day]:[]}
+function updateCounts(){$$('#v30Surface [data-drop-day]').forEach(sec=>{const d=Number(sec.dataset.dropDay),count=sec.querySelectorAll('.v30-plan-card:not(.v36-pending)').length;const small=sec.querySelector('header small');if(small){if(sec.matches('.v30-day'))small.textContent=`${count} ${count===1?'pieza':'piezas'}`;else if(sec.matches('.v30-agenda-group'))small.textContent=`${count} piezas`;else small.textContent=String(count)}})}
+function clearLegacyPointerHandlers(){$$('#plannerV30 .v30-source,#plannerV30 .v30-plan-card').forEach(n=>{n.onpointerdown=null;n.ontouchstart=null;n.onmousedown=null})}
+function waitFor(fn,timeout=900){return new Promise((resolve,reject)=>{const t0=performance.now();const tick=()=>{let v;try{v=fn()}catch{}if(v)return resolve(v);if(performance.now()-t0>timeout)return reject(new Error('timeout'));requestAnimationFrame(tick)};tick()})}
+async function syncMove(from,id,to){
+ const menu=$(`#weekBoard .day-card[data-instance="${cssEsc(id)}"][data-dow="${from}"] [data-menu],#weekBoard .day-card[data-instance="${cssEsc(id)}"] [data-menu]`);if(!menu)throw new Error('No encontré la ficha original');menu.click();
+ const b=await waitFor(()=>$(`#sheetBody [data-move="${to}"]`));b.click();
+ await waitFor(()=>dayItems(to).some(x=>String(x?.instanceId||x?.templateId)===String(id)),1200);
+}
+async function syncStep(day,id,act){
+ const menu=()=> $(`#weekBoard .day-card[data-instance="${cssEsc(id)}"][data-dow="${day}"] [data-menu],#weekBoard .day-card[data-instance="${cssEsc(id)}"] [data-menu]`);
+ const m=await waitFor(menu);m.click();const b=await waitFor(()=>$(`#sheetBody [data-act="${act}"]`));b.click();await sleep(55);
+}
+async function syncReorder(day,id,oldIndex,newIndex){const delta=newIndex-oldIndex;if(!delta)return;const act=delta>0?'down':'up';for(let i=0;i<Math.abs(delta);i++)await syncStep(day,id,act)}
+async function syncAdd(templateId,day,beforeIds){
+ const tab=$(`#dayTabs [data-day="${day}"]`);if(tab&&!tab.classList.contains('active'))tab.click();
+ await sleep(0);const src=await waitFor(()=>$(`#contentRail [data-template="${cssEsc(templateId)}"]`));src.click();
+ return await waitFor(()=>dayItems(day).find(x=>{const iid=String(x?.instanceId||'');return String(x?.templateId||x?.id||'')===String(templateId)&&iid&&!beforeIds.has(iid)}),1300);
+}
+function bindMenu(card,day,id){const b=card?.querySelector?.('[data-v30-menu]');if(!b)return;b.onclick=e=>{e.stopPropagation();const menu=$(`#weekBoard .day-card[data-instance="${cssEsc(id)}"][data-dow="${day}"] [data-menu],#weekBoard .day-card[data-instance="${cssEsc(id)}"] [data-menu]`);menu?.click()}}
+function fillPending(card,item,day){if(!card||!item)return;const id=item.instanceId||item.templateId||'';card.className='v30-plan-card';card.dataset.v30Item=id;card.dataset.dow=String(day);card.removeAttribute('data-template');card.innerHTML=`<span class="v30-handle" aria-hidden="true">⠿</span><div class="v30-cardcopy"><span class="lot">${item.lot||''}</span><b></b><small></small></div><button class="v30-menu" data-v30-menu="${id}" data-dow="${day}" aria-label="Opciones">•••</button>`;card.querySelector('b').textContent=item.title||'Contenido';card.querySelector('small').textContent=item.type||item.surface||'Contenido';bindMenu(card,day,id)}
+function pendingFromSource(source,day){const card=document.createElement('article');card.className='v30-plan-card v36-pending';card.dataset.dow=String(day);const title=source.querySelector('b')?.textContent||'Contenido',lot=source.querySelector('.lot')?.textContent||'';card.innerHTML=`<span class="v30-handle">⠿</span><div class="v30-cardcopy"><span class="lot"></span><b></b><small>Guardando…</small></div><span class="v36-pending-dot"></span>`;card.querySelector('.lot').textContent=lot;card.querySelector('b').textContent=title;return card}
+function baseOpts(){return {animation:reduced()?0:185,easing:'cubic-bezier(.2,.8,.2,1)',forceFallback:true,fallbackOnBody:true,fallbackTolerance:4,delay:coarse()?95:0,delayOnTouchOnly:true,touchStartThreshold:4,scroll:true,bubbleScroll:true,forceAutoScrollFallback:true,scrollSensitivity:72,scrollSpeed:11,emptyInsertThreshold:28,ghostClass:'v36-sortable-ghost',chosenClass:'v36-sortable-chosen',dragClass:'v36-sortable-drag',filter:'button,a,input,select,textarea',preventOnFilter:false,handle:coarse()?'.v30-handle':undefined}}
+function settleStart(){dragging=true;window.EDITORIAL_DND_SETTLING=true;document.body.classList.add('v36-dragging','v36-syncing');window.EDITORIAL_SMOOTH?.capture?.()}
+async function settleEnd(task,okText){try{await task;if(okText)toast(okText)}catch(e){console.warn('DnD sync failed',e);toast('No pude guardar el movimiento. Inténtalo otra vez.')}finally{await sleep(110);window.EDITORIAL_DND_SETTLING=false;dragging=false;document.body.classList.remove('v36-dragging','v36-syncing');updateCounts();window.EDITORIAL_FLEX_WEEK?.refresh?.();window.EDITORIAL_SMOOTH?.restore?.();scheduleRebuild(40)}}
+function listOptions(){return {...baseOpts(),group:{name:'editorial-plan',pull:true,put:true},draggable:'.v30-plan-card',onStart:settleStart,onEnd(evt){const item=evt.item,from=dayOf(evt.from),to=dayOf(evt.to),id=item?.dataset?.v30Item||'';if(!id||Number.isNaN(from)||Number.isNaN(to)){window.EDITORIAL_DND_SETTLING=false;dragging=false;document.body.classList.remove('v36-dragging','v36-syncing');return}if(from!==to){settleEnd(syncMove(from,id,to),`Movido a ${DN[to]}`)}else if(evt.oldDraggableIndex!==evt.newDraggableIndex){settleEnd(syncReorder(to,id,evt.oldDraggableIndex,evt.newDraggableIndex),'Orden actualizado')}else settleEnd(Promise.resolve(),'')}}}
+function catalogOptions(){return {...baseOpts(),group:{name:'editorial-plan',pull:'clone',put:false,revertClone:true},sort:false,draggable:'.v30-source',onStart:settleStart,onEnd(){if(dragging&&!document.querySelector('.v36-pending')){window.EDITORIAL_DND_SETTLING=false;dragging=false;document.body.classList.remove('v36-dragging','v36-syncing')}}}}
+function targetAddHandler(sortable){const prev=sortable.option('onAdd');sortable.option('onAdd',async evt=>{prev?.(evt);if(!evt.item?.classList.contains('v30-source'))return;const day=dayOf(evt.to),templateId=evt.item.dataset.template;if(Number.isNaN(day)||!templateId)return;const beforeIds=new Set(dayItems(day).map(x=>String(x?.instanceId||'')));const pending=pendingFromSource(evt.item,day);evt.item.replaceWith(pending);settleStart();await settleEnd((async()=>{const item=await syncAdd(templateId,day,beforeIds);fillPending(pending,item,day)})(),`Añadido a ${DN[day]}`)})}
+function destroy(){instances.forEach(x=>{try{x.destroy()}catch{}});instances=[]}
+function rebuild(){clearTimeout(rebuildTimer);if(!ready||dragging||!window.Sortable)return;destroy();clearLegacyPointerHandlers();const catalog=$('#v30Catalog');if(catalog)instances.push(new Sortable(catalog,catalogOptions()));const lists=$$('#v30Surface .v30-daylist,#v30Surface .v30-timeline-track,#v30Surface .v30-agenda-group > div');lists.forEach(list=>{const s=new Sortable(list,listOptions());targetAddHandler(s);instances.push(s)});document.documentElement.dataset.dnd='sortable-v36';const tip=$('.v30-tip');if(tip)tip.innerHTML=coarse()?'Arrastra desde <b>⠿</b> para mover. Los destinos se abren y reordenan con animación; “Añadir a…” sigue disponible.':'Arrastra una ficha directamente. También puedes usar <b>Añadir a…</b> y los menús como alternativa.'}
+function scheduleRebuild(ms=60){clearTimeout(rebuildTimer);rebuildTimer=setTimeout(rebuild,ms)}
+function watch(){observer?.disconnect();observer=new MutationObserver(records=>{if(dragging||window.EDITORIAL_DND_SETTLING)return;if(records.some(r=>r.target?.closest?.('#plannerV30')||r.target?.id==='plannerV30'))scheduleRebuild()});observer.observe(document.body,{childList:true,subtree:true})}
+async function boot(){try{await loadSortable();ready=true;rebuild();watch()}catch(e){console.info('SortableJS no disponible; se conserva el drag clásico.',e);document.documentElement.dataset.dnd='classic-fallback'}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+window.EDITORIAL_DND_V36={rebuild};
+})();
