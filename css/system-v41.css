@@ -1,0 +1,274 @@
+/*
+ Editorial Emulator V4.1
+ Shared Web / PWA / macOS responsive precision layer.
+ No business logic lives here.
+*/
+
+:root{
+  --v41-control-h:38px;
+  --v41-touch-h:44px;
+  --v41-control-radius:10px;
+  --v41-gap-1:6px;
+  --v41-gap-2:10px;
+  --v41-gap-3:14px;
+}
+
+*,*::before,*::after{
+  box-sizing:border-box;
+}
+
+html{
+  width:100%;
+  min-width:0;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+
+body{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  line-height:1.15;
+}
+
+img,
+video,
+canvas,
+svg{
+  max-width:100%;
+}
+
+.topbar,
+.top-actions,
+.toolbar,
+.controls,
+.control-row,
+.v30-planner,
+.v30-planner-head,
+.v30-surface,
+.v37-workbench,
+.v37-library,
+.v37-library-tools,
+.v30-catalog,
+.v30-viewseg{
+  min-width:0;
+}
+
+.topbar,
+.v30-planner-head,
+.v37-library-tools{
+  align-items:center;
+}
+
+.top-actions,
+.toolbar,
+.control-row{
+  gap:8px;
+}
+
+.top-actions > *,
+.toolbar > *,
+.control-row > *{
+  min-width:0;
+}
+
+.v30-viewseg{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:stretch;
+}
+
+.v30-viewseg button,
+.v38-catalog-toggle,
+.v30-planner-head button,
+.v37-library-tools button,
+.v37-library button{
+  min-height:var(--v41-control-h);
+  line-height:1.1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.v30-viewseg button{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.v30-source,
+.v30-plan-card,
+.v37-library,
+.v37-workbench > *,
+.v30-surface > *{
+  min-width:0;
+}
+
+.v30-source *,
+.v30-plan-card *{
+  overflow-wrap:anywhere;
+}
+
+.v30-source button,
+.v30-plan-card button{
+  overflow-wrap:normal;
+}
+
+.v37-search{
+  width:100%;
+  min-width:0;
+  min-height:var(--v41-control-h);
+}
+
+.v37-lotseg{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+.v37-lotseg button{
+  min-width:0;
+}
+
+@media (min-width:1280px){
+  .v37-workbench{
+    grid-template-columns:minmax(0,1fr) clamp(320px,25vw,390px)!important;
+  }
+}
+
+@media (min-width:960px) and (max-width:1279px){
+  .v37-workbench{
+    grid-template-columns:minmax(0,1fr) minmax(290px,330px)!important;
+  }
+}
+
+@media (max-width:959px){
+  .topbar{
+    gap:8px;
+  }
+
+  .v37-workbench{
+    display:block!important;
+  }
+
+  .v37-workbench > #v30Surface{
+    width:100%!important;
+  }
+
+  .v30-planner-head{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    gap:8px!important;
+  }
+
+  .v30-viewseg{
+    grid-column:1/-1;
+    width:100%;
+  }
+
+  .v38-catalog-toggle{
+    grid-column:1/-1;
+    width:100%;
+  }
+}
+
+@media (max-width:719px){
+  :root{
+    --v41-control-h:42px;
+  }
+
+  body{
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
+  }
+
+  button,
+  [role="button"],
+  input,
+  select{
+    min-height:var(--v41-touch-h);
+  }
+
+  .topbar{
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+
+  .top-actions{
+    flex-wrap:wrap;
+  }
+
+  .v30-planner-head{
+    grid-template-columns:1fr!important;
+  }
+
+  .v30-viewseg,
+  .v38-catalog-toggle{
+    grid-column:1!important;
+  }
+
+  .v30-viewseg button{
+    padding-inline:7px!important;
+    font-size:12px!important;
+  }
+
+  .v37-library{
+    width:100%!important;
+    max-width:none!important;
+  }
+
+  .v37-library-tools{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
+
+@media (max-width:429px){
+  .v30-viewseg button{
+    font-size:11px!important;
+    letter-spacing:-.01em;
+  }
+
+  .v37-lotseg{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .v30-source,
+  .v30-plan-card{
+    border-radius:12px!important;
+  }
+}
+
+@media (display-mode:standalone){
+  body{
+    min-height:100dvh;
+  }
+
+  .topbar{
+    padding-top:env(safe-area-inset-top);
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
