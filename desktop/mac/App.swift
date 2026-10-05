@@ -25,8 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             .titled,
             .closable,
             .miniaturizable,
-            .resizable,
-            .fullSizeContentView
+            .resizable
         ]
         window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1440, height: 900),
@@ -37,11 +36,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         window.title = "Editorial Emulator"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
+        window.isMovable = true
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 900, height: 620)
+        window.collectionBehavior.insert(.fullScreenPrimary)
+        window.minSize = NSSize(width: 760, height: 560)
+        window.contentMinSize = NSSize(width: 760, height: 560)
         window.contentView = webView
+
+        let restoredFrame = window.setFrameUsingName("EditorialEmulator.MainWindow")
         window.setFrameAutosaveName("EditorialEmulator.MainWindow")
-        window.center()
+        if !restoredFrame {
+            window.center()
+        }
         window.makeKeyAndOrderFront(nil)
 
         installMenu()
