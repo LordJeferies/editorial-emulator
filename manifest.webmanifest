@@ -1,9 +1,9 @@
 {
   "id": "./",
-  "name": "Editorial Emulator V4.1",
+  "name": "Editorial Emulator V4.2",
   "short_name": "Editorial",
-  "description": "Emulador editorial local-first con Board, Timeline y Agenda, biblioteca de contenido, drag & drop, ciclos flexibles, feeds Mobile/Desktop y Cloud sobre un runtime estable sin observers recursivos.",
-  "start_url": "./?pwa=1&v=41",
+  "description": "Emulador editorial local-first con Smart Drag, clasificación A1-A4, filtros por tipo/familia/lote/orden, Board, Timeline, Agenda, feeds y Cloud sobre un runtime estable.",
+  "start_url": "./?pwa=1&v=42",
   "scope": "./",
   "display": "standalone",
   "background_color": "#050506",
@@ -20,23 +20,23 @@
   "shortcuts": [
     {
       "name": "Plan",
-      "url": "./?v=41#plan"
+      "url": "./?v=42#plan"
     },
     {
       "name": "Feeds",
-      "url": "./?v=41#feeds"
+      "url": "./?v=42#feeds"
     },
     {
       "name": "Biblioteca",
-      "url": "./?v=41#library"
+      "url": "./?v=42#library"
     },
     {
       "name": "MCP",
-      "url": "./mcp.html?v=41"
+      "url": "./mcp.html?v=42"
     },
     {
       "name": "Ayuda",
-      "url": "./help.html?v=41"
+      "url": "./help.html?v=42"
     }
   ],
   "display_override": [
