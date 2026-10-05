@@ -1,0 +1,15 @@
+/* Editorial Emulator V3.6 — fluid drag/drop */
+html[data-dnd="sortable-v36"] .v30-plan-card,html[data-dnd="sortable-v36"] .v30-source{will-change:transform;transform:translateZ(0);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+html[data-dnd="sortable-v36"] .v30-handle{display:grid;place-items:center;min-width:28px;min-height:28px;margin:-5px 0 -5px -5px;border-radius:8px;touch-action:none;cursor:grab;transition:background .12s ease,color .12s ease,transform .12s ease}
+html[data-dnd="sortable-v36"] .v30-handle:active{cursor:grabbing;background:rgba(255,255,255,.08);color:#fff;transform:scale(.96)}
+.v36-sortable-chosen{border-color:rgba(139,130,255,.42)!important;background:#1b1e26!important;box-shadow:0 8px 26px rgba(0,0,0,.22),inset 0 0 0 1px rgba(139,130,255,.12)!important}
+.v36-sortable-ghost{opacity:.24!important;border-style:dashed!important;border-color:rgba(139,130,255,.6)!important;background:rgba(139,130,255,.10)!important;box-shadow:none!important}
+.v36-sortable-drag{opacity:.98!important;transform:translateZ(0) scale(1.018)!important;box-shadow:0 18px 48px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.10)!important;z-index:999999!important;pointer-events:none!important}
+body.v36-dragging .v30-day,body.v36-dragging .v30-timeline-row,body.v36-dragging .v30-agenda-group{transition:border-color .12s ease,background .12s ease,box-shadow .12s ease}
+body.v36-dragging [data-drop-day]:has(.v36-sortable-ghost){border-color:rgba(139,130,255,.6)!important;background:rgba(139,130,255,.07)!important;box-shadow:inset 0 0 0 1px rgba(139,130,255,.14)}
+body.v36-syncing #sheet,body.v36-syncing #sheetBackdrop{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+.v36-pending{opacity:.72!important;border-style:dashed!important;pointer-events:none!important}.v36-pending-dot{width:8px;height:8px;border-radius:50%;background:#8b82ff;box-shadow:0 0 0 0 rgba(139,130,255,.5);animation:v36pulse 1.1s ease-out infinite}
+@keyframes v36pulse{0%{box-shadow:0 0 0 0 rgba(139,130,255,.45)}70%{box-shadow:0 0 0 8px rgba(139,130,255,0)}100%{box-shadow:0 0 0 0 rgba(139,130,255,0)}}
+html[data-dnd="sortable-v36"] .v30-daylist:empty,html[data-dnd="sortable-v36"] .v30-timeline-track:empty,html[data-dnd="sortable-v36"] .v30-agenda-group>div:empty{min-height:84px}
+@media(pointer:coarse){html[data-dnd="sortable-v36"] .v30-handle{min-width:34px;min-height:34px;margin:-7px 0 -7px -7px;font-size:19px}.v30-plan-card{min-height:58px}.v30-source{touch-action:pan-x pan-y}.v30-plan-card{touch-action:pan-y}}
+@media(prefers-reduced-motion:reduce){.v36-sortable-chosen,.v36-sortable-ghost,.v36-sortable-drag,.v30-handle{transition:none!important;animation:none!important}.v36-pending-dot{animation:none!important}}
