@@ -1,0 +1,9 @@
+/* Editorial Emulator V3.5 — no-flash interaction layer */
+html.ee-silent-mutation #sheet,
+html.ee-silent-mutation #sheetBackdrop{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+/* Routine autosave/cloud sync is represented by the status pills only. Progress UI remains for explicit/manual long operations. */
+html[data-editorial-version="3.5"] #eeProgress,
+html[data-editorial-version="3.5"] #eeProgressMeta{transition:opacity .16s ease,transform .16s ease}
+/* Reduce paint churn on planner updates. */
+#plannerV30,.v30-surface,.v30-board,.v30-timeline,.v30-agenda{contain:layout paint style}
+.v30-plan-card,.v30-day,.v30-timeline-row,.v30-agenda-group{backface-visibility:hidden;transform:translateZ(0)}
