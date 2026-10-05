@@ -1,0 +1,43 @@
+/* Editorial Emulator V3.9 — restore V3.7 visual hierarchy; V3.8 drawer is additive only */
+:root{
+  --accent:#f5bc35;
+  --surface-base:#090a0d;--surface-raised:#111318;--surface-elevated:#171a21;--surface-floating:#1d2129;
+  --text-primary:#f5f6f8;--text-secondary:#a0a7b2;--text-tertiary:#717986;
+  --border-subtle:rgba(255,255,255,.07);--border-default:rgba(255,255,255,.11);--border-strong:rgba(255,255,255,.18);
+  --success:#32d583;--warning:#f8b84e;--danger:#ff626d;--info:#6aa8ff;
+  --glass-navigation:rgba(15,17,21,.72);--glass-overlay:rgba(18,20,25,.80);--material-muted:#0d0f13;--material-translucent:rgba(17,19,24,.86)
+}
+html,body{background:#090a0d!important;color:var(--text-primary)!important}
+.topbar,.side-nav,.bottom-nav{background:var(--glass-navigation)!important}
+.toolbar,.panel,.day-column,.v30-planner{background:var(--surface-raised)!important}
+.day-card,.rail-card,.v30-plan-card,.v30-source{background:var(--surface-elevated)!important}
+
+/* The three planner views remain first-class and visually dominant. */
+.v30-planner-head{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important}
+.v30-viewseg{display:inline-grid!important;grid-template-columns:repeat(3,minmax(72px,1fr))!important;gap:3px!important;padding:3px!important;border-radius:11px!important;background:#181b21!important;visibility:visible!important;opacity:1!important}
+.v30-viewseg button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:34px!important;padding:0 12px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#9298a3!important;font-weight:700!important}
+.v30-viewseg button.active{background:#3b3f48!important;color:#fff!important;box-shadow:0 1px 4px rgba(0,0,0,.24)!important}
+
+/* Content drawer is an extra tool, never a replacement for Board / Timeline / Agenda. */
+.v38-catalog-toggle{flex:0 0 auto!important;order:initial!important;background:#191c22!important;color:#f3f4f7!important;border-color:rgba(255,255,255,.1)!important}
+.v38-catalog-toggle.active{background:rgba(106,168,255,.12)!important;border-color:rgba(106,168,255,.34)!important}
+.v37-library{background:#111318!important}.v37-library .v30-catalog-head{background:rgba(255,255,255,.015)!important}.v37-library-tools{background:transparent!important}.v37-search{background:#0d0f13!important}.v37-lotseg{background:rgba(255,255,255,.04)!important}.v37-lotseg button.active{background:rgba(255,255,255,.1)!important;color:#fff!important}
+.v37-library .v30-source{background:#15181e!important}.v37-library .v30-source:hover{background:#191c22!important}
+.v37-library .v30-add{background:rgba(255,255,255,.055)!important;color:#f0f1f4!important}
+
+/* Semantic colour is detail, not the overall skin. */
+.v38-lot-l1 .lot{color:#f2c36b!important}.v38-lot-l2 .lot{color:#75aaff!important}.v38-lot-l3 .lot{color:#5fdaa0!important}.v33-cycle-first{border-color:rgba(159,140,255,.32)!important}.v33-cycle-first>header{background:rgba(159,140,255,.045)!important}
+
+/* Avoid layout jumps while the optional drawer mounts. */
+#plannerV30{contain:layout style}.v37-workbench{min-width:0}.v37-workbench>#v30Surface{min-width:0}
+@media(max-width:900px){
+  .v30-planner-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important}
+  .v30-planner-head>.v30-viewseg{grid-column:1/-1!important;width:100%!important;order:1!important}
+  .v38-catalog-toggle{grid-column:1/-1!important;width:100%!important;order:2!important;min-height:42px!important}
+  .v37-workbench{display:block!important}
+  .v37-workbench>#v30Surface{display:block!important;width:100%!important}
+}
+@media(max-width:560px){
+  .v30-viewseg{grid-template-columns:repeat(3,1fr)!important}
+  .v30-viewseg button{padding-inline:7px!important;font-size:11.5px!important}
+}
