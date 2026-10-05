@@ -1,7 +1,7 @@
 import AppKit
 import WebKit
 
-private let canonicalURL = URL(string: "https://lordjeferies.github.io/editorial-emulator/")!
+private let canonicalURL = URL(string: "https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=40")!
 private let canonicalHost = canonicalURL.host
 
 final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate {
@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+        configuration.applicationNameForUserAgent = "EditorialEmulatorDesktop/4.0"
 
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
@@ -50,7 +51,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
 
     private func loadCanonicalApp() {
         var request = URLRequest(url: canonicalURL)
-        request.cachePolicy = .reloadRevalidatingCacheData
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 30
         webView.load(request)
     }
@@ -126,7 +127,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     ) -> WKWebView? {
         if let url = navigationAction.request.url {
             if url.host == canonicalHost {
-                webView.load(URLRequest(url: url))
+                webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
             } else {
                 NSWorkspace.shared.open(url)
             }
@@ -151,9 +152,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         <!doctype html><html><meta name='viewport' content='width=device-width,initial-scale=1'>
         <body style='margin:0;background:#090a0d;color:#f5f6f8;font:15px -apple-system;padding:48px'>
         <h1 style='font-size:28px'>Editorial Emulator está sin conexión</h1>
-        <p style='color:#98a0ad;max-width:620px'>No pudimos cargar GitHub Pages. Tus datos locales no se han borrado. Comprueba la conexión y vuelve a intentar.</p>
+        <p style='color:#98a0ad;max-width:620px'>No pudimos cargar la aplicación. Tus datos locales no se han borrado. Comprueba la conexión y vuelve a intentar.</p>
         <p style='color:#777'>\(escaped)</p>
-        <button onclick='location.href="https://lordjeferies.github.io/editorial-emulator/"' style='padding:12px 16px;border:0;border-radius:12px;font-weight:700'>Volver a intentar</button>
+        <button onclick='location.href="https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=40"' style='padding:12px 16px;border:0;border-radius:12px;font-weight:700'>Volver a intentar</button>
         </body></html>
         """
         webView.loadHTMLString(html, baseURL: canonicalURL)
