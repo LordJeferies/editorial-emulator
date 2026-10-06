@@ -1,0 +1,53 @@
+/* Editorial Emulator V4.4 · Board/Timeline/Agenda stability + fluidity */
+:root{--v44-day-min:156px;--v44-lib-w:clamp(300px,25vw,360px)}
+
+/* Isolate planner layout so changes inside one card do not relayout the whole page. */
+.v44-planner{contain:layout style paint}.v44-planner .v30-surface{container-type:inline-size;container-name:v44surface;overflow:visible!important}.v30-day,.v30-timeline-row,.v30-agenda-group{contain:layout paint style}
+
+/* The content drawer gets a deterministic width. Opening it no longer changes Board topology. */
+.v37-workbench{grid-template-columns:minmax(0,1fr) var(--v44-lib-w)!important;align-items:start!important}
+.v37-catalog-expanded .v37-workbench{--v44-lib-w:clamp(420px,34vw,520px)}
+.v37-catalog-closed .v37-workbench{grid-template-columns:minmax(0,1fr)!important}
+.v37-workbench>#v30Surface{min-width:0!important;overflow:hidden!important}
+
+/* Board: always seven days in ONE row on desktop/tablet. If there is not enough room, scroll horizontally; never wrap Sunday below Monday. */
+.v30-board{display:grid!important;grid-template-columns:repeat(7,minmax(var(--v44-day-min),1fr))!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;align-items:start!important;gap:8px!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:visible!important;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:1px 1px 8px!important;scrollbar-gutter:stable}
+.v30-board .v30-day{min-width:var(--v44-day-min)!important;width:auto!important;max-width:none!important;min-height:148px!important;scroll-snap-align:start}
+.v30-board .v30-daylist{min-height:72px!important;align-content:start}.v30-board .v30-dropempty{min-height:66px!important}
+@container v44surface (min-width:1120px){.v30-board{grid-template-columns:repeat(7,minmax(0,1fr))!important;overflow-x:hidden!important}.v30-board .v30-day{min-width:0!important}}
+
+/* Planner cards: explicit grid placement prevents A1/A2, status, menu and notes badges from colliding. */
+.v30-plan-card{display:grid!important;grid-template-columns:14px minmax(0,1fr) 30px!important;grid-template-rows:auto auto auto!important;align-items:start!important;gap:5px 7px!important;padding:9px!important;min-width:0!important}
+.v30-plan-card>.v30-handle{grid-column:1;grid-row:1;align-self:start}.v30-plan-card>.v30-cardcopy{grid-column:2;grid-row:1;min-width:0}.v30-plan-card>.v30-menu{grid-column:3;grid-row:1;align-self:start;justify-self:end}.v30-plan-card>.v42-order-chip{grid-column:2;grid-row:2;justify-self:start;margin-top:1px;min-height:25px!important;height:25px!important}.v30-plan-card>.v43-workflow-summary{grid-column:1/-1;grid-row:3;margin:2px 0 0!important;display:flex!important;flex-wrap:nowrap!important;min-width:0;overflow:hidden}.v30-plan-card>.v43-workflow-summary>*{flex:0 0 auto}.v30-plan-card>.v43-workflow-summary .v43-status-pill{min-width:0;max-width:118px}.v30-plan-card>.v43-workflow-summary .v43-attn{min-width:0;max-width:132px;overflow:hidden;text-overflow:ellipsis}.v30-plan-card>.v43-workflow-summary .v43-detail-btn,.v30-plan-card>.v43-workflow-summary .v43-link-dot{margin-left:auto}
+.v30-cardcopy b{overflow-wrap:anywhere}.v30-cardcopy small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Agenda has a fourth action column and compact rows instead of large empty bands. */
+.v30-agenda{gap:8px!important}.v30-agenda-group{overflow:hidden}.v30-agenda-group>header{min-height:48px!important;padding:8px 10px!important}.v30-agenda-group>div{display:grid!important;gap:0!important}.v30-agenda-group .v30-plan-card{grid-template-columns:14px minmax(0,1fr) auto 30px!important;grid-template-rows:auto auto auto!important;min-height:62px!important;padding:9px 10px!important}.v30-agenda-group .v30-plan-card>.v30-handle{grid-column:1;grid-row:1}.v30-agenda-group .v30-plan-card>.v30-cardcopy{grid-column:2;grid-row:1}.v30-agenda-group .v30-plan-card>.v30-order{grid-column:3;grid-row:1/3;align-self:center}.v30-agenda-group .v30-plan-card>.v30-menu{grid-column:4;grid-row:1}.v30-agenda-group .v30-plan-card>.v42-order-chip{grid-column:2;grid-row:2}.v30-agenda-group .v30-plan-card>.v43-workflow-summary{grid-column:2/5;grid-row:3}.v30-agenda-group .v30-dropempty{min-height:58px!important;margin:8px!important}
+
+/* Timeline cards use a predictable width and do not stretch when workflow badges appear. */
+.v30-timeline{gap:8px!important}.v30-timeline-row{grid-template-columns:104px minmax(0,1fr)!important}.v30-timeline-track{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(210px,230px);align-items:start!important;gap:7px!important;overflow-x:auto!important;min-height:82px!important}.v30-timeline-track .v30-plan-card{width:auto!important;min-width:0!important;max-width:none!important}
+
+/* Library cards stay compact even with taxonomy + workflow metadata. */
+.v37-library #v30Catalog{align-content:start!important}.v37-library .v30-source{display:grid!important;grid-template-columns:16px minmax(0,1fr)!important;grid-template-rows:auto auto!important;align-content:start!important;min-height:142px!important;padding:10px 9px 42px!important}.v37-library .v30-source>.v42-order-chip{position:absolute!important;top:8px;right:8px;z-index:2}.v37-library .v30-source>.v43-workflow-summary{grid-column:1/-1!important;margin:7px 0 0!important;display:flex!important;flex-wrap:nowrap!important;overflow:hidden}.v37-library .v30-source>.v43-workflow-summary .v43-attn{max-width:96px;overflow:hidden;text-overflow:ellipsis}.v37-library .v30-source>.v43-workflow-summary .v43-detail-btn{margin-left:auto}.v37-library .v30-source>.v43-workflow-summary .v43-status-pill{max-width:104px}
+
+/* Drag mode no longer animates the workbench columns. The Board keeps exactly the same geometry while the palette appears. */
+html.v42-smart-dragging #v37Workbench{grid-template-columns:minmax(0,1fr) var(--v44-lib-w)!important;transition:none!important}.v37-catalog-expanded html.v42-smart-dragging #v37Workbench{grid-template-columns:minmax(0,1fr) var(--v44-lib-w)!important}html.v42-smart-dragging .v37-library{max-width:none!important;max-height:calc(100dvh - 96px)!important;min-height:0!important;transform:scale(.985);transform-origin:top right;opacity:.48!important;transition:opacity .1s ease,transform .1s ease!important}html.v42-smart-dragging .v42-day-palette{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,22,27,.98)!important}
+
+/* Switching modes and opening the library should feel immediate, not like a layout animation. */
+.v37-workbench,.v30-board,.v30-timeline,.v30-agenda,.v30-day,.v30-plan-card{transition:none!important}
+
+@media(max-width:1180px) and (min-width:761px){:root{--v44-lib-w:300px;--v44-day-min:164px}.v37-catalog-expanded .v37-workbench{--v44-lib-w:420px}.v30-planner-head{align-items:center!important}.v33-cycle-control{width:auto!important;margin-left:auto!important}}
+
+@media(max-width:900px){.v37-workbench{display:block!important;padding:10px!important}.v37-workbench>#v30Surface{width:100%!important;overflow:hidden!important}html.v42-smart-dragging #v37Workbench{display:block!important}.v37-library{transform:none!important}.v30-timeline-row{grid-template-columns:88px minmax(0,1fr)!important}}
+
+@media(max-width:760px){
+ .v30-planner-head{display:grid!important;grid-template-columns:1fr!important;align-items:start!important;gap:9px!important}.v30-planner-head>div:first-child{min-width:0}.v30-viewseg{grid-column:1!important;width:100%!important;order:2}.v38-catalog-toggle{grid-column:1!important;width:100%!important;order:3}.v33-cycle-control{grid-column:1!important;width:100%!important;margin:0!important;order:1;grid-template-columns:minmax(0,1fr) auto!important}
+ .v30-surface{overflow:visible!important}.v30-board{grid-template-columns:1fr!important;grid-auto-flow:row!important;overflow:visible!important;gap:7px!important;padding-bottom:0!important}.v30-board .v30-day{width:100%!important;min-width:0!important;min-height:0!important;scroll-snap-align:none!important}.v30-board .v30-daylist{min-height:0!important;padding:7px!important}.v30-board .v30-dropempty{min-height:58px!important}.v30-day>header{min-height:48px!important}
+ .v30-plan-card{grid-template-columns:14px minmax(0,1fr) 30px!important}.v30-plan-card>.v43-workflow-summary{flex-wrap:wrap!important}.v30-plan-card>.v43-workflow-summary .v43-detail-btn,.v30-plan-card>.v43-workflow-summary .v43-link-dot{margin-left:0}
+ .v30-agenda-group .v30-plan-card{grid-template-columns:14px minmax(0,1fr) 30px!important}.v30-agenda-group .v30-plan-card>.v30-order{grid-column:2/4;grid-row:3;justify-self:start}.v30-agenda-group .v30-plan-card>.v30-menu{grid-column:3;grid-row:1}.v30-agenda-group .v30-plan-card>.v43-workflow-summary{grid-column:1/-1;grid-row:4}.v30-agenda-group .v30-plan-card>.v42-order-chip{grid-column:2;grid-row:2}
+ .v30-timeline-row{grid-template-columns:74px minmax(0,1fr)!important}.v30-timeline-track{grid-auto-columns:minmax(210px,76vw)}
+}
+
+@media(max-width:520px){.v33-cycle-control{grid-template-columns:1fr!important}.v33-cycle-summary{grid-template-columns:auto 1fr;align-items:baseline;gap:8px;min-width:0}.v30-viewseg button{font-size:11px!important;padding-inline:5px!important}.v30-plan-card>.v43-workflow-summary .v43-attn{max-width:110px}}
+
+@media(prefers-reduced-motion:reduce){html.v42-smart-dragging .v37-library{transition:none!important}}
