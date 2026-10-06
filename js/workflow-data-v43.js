@@ -15,6 +15,7 @@ function templateRecord(id,create=false){if(!state.templates[id]&&create)state.t
 function instanceRecord(id,templateId,create=false){if(!state.instances[id]&&create){const t=templateRecord(templateId,false);state.instances[id]=base({status:t.status,assetUrl:t.assetUrl})}return state.instances[id]||base(templateRecord(templateId,false))}
 function record(ref,create=false){return !ref?null:ref.scope==='instance'?instanceRecord(ref.id,ref.templateId,create):templateRecord(ref.id,create)}
 function persist(){state.updatedAt=now();localStorage.setItem(K_WORK,JSON.stringify(state));window.dispatchEvent(new CustomEvent('editorial:v43-changed',{detail:{updatedAt:state.updatedAt}}))}
+function replaceState(next){state=normalize(next||{});localStorage.setItem(K_WORK,JSON.stringify(state));window.dispatchEvent(new CustomEvent('editorial:v43-changed',{detail:{updatedAt:state.updatedAt,source:'cloud'}}))}
 function statusLabel(id){return STATUS_MAP[id]||'Sin empezar'}
 function summary(rec){const notes=rec?.notes||[],open=notes.filter(n=>!n.done),corr=open.filter(n=>n.kind==='correction'),doneCorr=notes.some(n=>n.kind==='correction'&&n.done);if(corr.length)return {kind:'correction',label:corr.length>1?`${corr.length} correcciones`:'Corrección pendiente'};if(open.length)return {kind:'note',label:open.length>1?`${open.length} notas`:'Nota pendiente'};if(rec?.status==='corrected'||doneCorr)return {kind:'ready',label:'Corrección lista'};if(notes.length)return {kind:'ready',label:'Notas listas'};return null}
 function setStatus(ref,status){if(!STATUS_MAP[status])return;const r=record(ref,true);r.status=status;r.updatedAt=now();persist()}
@@ -26,5 +27,5 @@ function validUrl(v){let s=String(v||'').trim();if(!s)return '';if(!/^https?:\/\
 function css(s){return globalThis.CSS?.escape?CSS.escape(String(s)):String(s).replace(/(["'\\.#:[\]()>+~*])/g,'\\$1')}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function toast(t){const r=document.querySelector('#toastRegion');if(!r)return;const n=document.createElement('div');n.className='toast';n.textContent=t;r.append(n);setTimeout(()=>n.remove(),2200)}
-window.EDITORIAL_V43={STATUSES,STATUS_MAP,app,saveApp,draft,instance,template,refFor,record,persist,statusLabel,summary,setStatus,setLink,addNote,toggleNote,deleteNote,validUrl,css,esc,toast,clone,state:()=>clone(state)};
+window.EDITORIAL_V43={STATUSES,STATUS_MAP,app,saveApp,draft,instance,template,refFor,record,persist,replaceState,statusLabel,summary,setStatus,setLink,addNote,toggleNote,deleteNote,validUrl,css,esc,toast,clone,state:()=>clone(state)};
 })();
