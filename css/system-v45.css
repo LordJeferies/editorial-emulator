@@ -1,0 +1,45 @@
+/* Editorial Emulator V4.5 · root layout fix */
+:root{--v45-drawer-w:390px;--v45-gap:8px}
+
+/* The library is an overlay drawer. It no longer consumes planner width or causes Board reflow. */
+.v45-drawer-workbench,.v37-workbench{display:block!important;position:relative!important;padding:12px 14px 14px!important;min-width:0!important}
+.v45-drawer-workbench>#v30Surface,.v37-workbench>#v30Surface{width:100%!important;min-width:0!important;overflow:visible!important;padding:0!important}
+.v37-library{position:fixed!important;top:118px!important;right:18px!important;bottom:22px!important;left:auto!important;width:min(var(--v45-drawer-w),calc(100vw - 108px))!important;max-width:none!important;max-height:none!important;height:auto!important;z-index:5000!important;display:flex!important;flex-direction:column!important;background:rgba(12,13,15,.985)!important;box-shadow:0 26px 90px rgba(0,0,0,.58),0 0 0 1px rgba(255,255,255,.08)!important;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);contain:layout paint style;transition:opacity .12s ease,transform .12s ease,width .12s ease!important}
+.v37-catalog-closed .v37-library{display:none!important}.v37-catalog-expanded .v37-library{--v45-drawer-w:520px}
+.v37-library #v30Catalog{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain!important}
+
+/* Drag can collapse the overlay without moving a single Board column. */
+html.v42-smart-dragging .v37-library{transform:translate3d(calc(100% - 54px),0,0)!important;opacity:.34!important;pointer-events:none!important}
+html.v42-smart-dragging .v45-drawer-workbench,html.v42-smart-dragging .v37-workbench{display:block!important;grid-template-columns:none!important}
+
+/* Board topology is deterministic. No auto-fit / auto-wrap surprises. */
+.v44-planner .v30-surface{container-type:inline-size!important;container-name:v45surface!important;overflow:visible!important}
+.v30-board{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;width:100%!important;max-width:none!important;gap:var(--v45-gap)!important;overflow:visible!important;align-items:start!important;padding:1px 1px 8px!important}
+.v30-board .v30-day{width:100%!important;min-width:0!important;max-width:none!important;min-height:140px!important;align-self:start!important}
+.v30-board .v30-daylist{min-height:68px!important;align-content:start!important}.v30-board .v30-dropempty{min-height:60px!important}
+
+/* Readable cards, fixed action zones, no accidental growth from metadata. */
+.v30-plan-card{min-width:0!important;max-width:100%!important;overflow:hidden!important}.v30-cardcopy{min-width:0!important}.v30-cardcopy b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden!important;line-height:1.22!important}.v30-cardcopy small{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.v30-plan-card>.v43-workflow-summary{max-width:100%!important;overflow:hidden!important}.v30-plan-card>.v43-workflow-summary .v43-status-pill{max-width:96px!important}.v30-plan-card>.v43-workflow-summary .v43-attn{max-width:90px!important}.v30-plan-card>.v43-workflow-summary .v43-status-pill span,.v30-plan-card>.v43-workflow-summary .v43-attn{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+
+/* Timeline and Agenda keep their own stable geometry. */
+.v30-timeline-row{grid-template-columns:96px minmax(0,1fr)!important}.v30-timeline-track{grid-auto-columns:220px!important;min-height:78px!important}.v30-agenda-group>header{min-height:46px!important}.v30-agenda-group .v30-plan-card{min-height:58px!important}
+
+/* Exact responsive topology by available planner width, not by incidental child widths. */
+@container v45surface (max-width:1050px){.v30-board{grid-template-columns:repeat(4,minmax(0,1fr))!important}.v30-board .v30-day{min-height:128px!important}}
+@container v45surface (max-width:760px){.v30-board{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@container v45surface (max-width:520px){.v30-board{grid-template-columns:1fr!important}.v30-board .v30-day{min-height:0!important}.v30-board .v30-daylist{min-height:0!important}}
+
+/* Medium desktop/tablet: overlay stays overlay and never steals the Board column. */
+@media(max-width:1100px) and (min-width:901px){:root{--v45-drawer-w:350px}.v37-catalog-expanded .v37-library{--v45-drawer-w:460px}.v37-library{right:12px!important;top:110px!important;bottom:16px!important}}
+
+/* Mobile keeps the same data/layout model but presents the library as a bottom sheet. */
+@media(max-width:900px){
+ .v45-drawer-workbench,.v37-workbench{display:block!important;padding:10px!important}.v45-drawer-workbench>#v30Surface,.v37-workbench>#v30Surface{width:100%!important;overflow:visible!important}
+ .v37-library{position:fixed!important;left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;top:auto!important;bottom:calc(70px + env(safe-area-inset-bottom))!important;width:auto!important;height:min(56dvh,620px)!important;max-height:72dvh!important;min-height:220px!important;border-radius:20px!important;transform:none!important}
+ html.v42-smart-dragging .v37-library{transform:translate3d(0,calc(100% - 58px),0)!important;opacity:.28!important}
+ .v30-timeline-row{grid-template-columns:78px minmax(0,1fr)!important}.v30-timeline-track{grid-auto-columns:minmax(210px,72vw)!important}
+}
+
+@media(max-width:760px){.v30-planner-head{display:grid!important;grid-template-columns:1fr!important}.v33-cycle-control{order:1!important}.v30-viewseg{order:2!important}.v38-catalog-toggle{order:3!important}.v30-board{grid-template-columns:1fr!important;gap:7px!important}.v30-board .v30-day{min-height:0!important}.v30-board .v30-daylist{min-height:0!important}.v30-plan-card>.v43-workflow-summary{flex-wrap:wrap!important}}
+
+@media(prefers-reduced-motion:reduce){.v37-library{transition:none!important}}
