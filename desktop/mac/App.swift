@@ -1,7 +1,7 @@
 import AppKit
 import WebKit
 
-private let canonicalURL = URL(string: "https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=44")!
+private let canonicalURL = URL(string: "https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=45")!
 private let canonicalHost = canonicalURL.host
 
 final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate {
@@ -13,7 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         configuration.websiteDataStore = .default()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
-        configuration.applicationNameForUserAgent = "EditorialEmulatorDesktop/4.4"
+        configuration.applicationNameForUserAgent = "EditorialEmulatorDesktop/4.5"
 
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
@@ -160,7 +160,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         <h1 style='font-size:28px'>Editorial Emulator está sin conexión</h1>
         <p style='color:#98a0ad;max-width:620px'>No pudimos cargar la aplicación. Tus datos locales no se han borrado. Comprueba la conexión y vuelve a intentar.</p>
         <p style='color:#777'>\(escaped)</p>
-        <button onclick='location.href="https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=44"' style='padding:12px 16px;border:0;border-radius:12px;font-weight:700'>Volver a intentar</button>
+        <button onclick='location.href="https://lordjeferies.github.io/editorial-emulator/?desktop=1&v=45"' style='padding:12px 16px;border:0;border-radius:12px;font-weight:700'>Volver a intentar</button>
         </body></html>
         """
         webView.loadHTMLString(html, baseURL: canonicalURL)
