@@ -2,6 +2,7 @@
   "id": "./",
   "name": "Editorial Emulator V4.4",
   "short_name": "Editorial",
+  "lang": "es-419",
   "description": "Emulador editorial local-first con planner estable y fluido, Board determinista de 7 días, Timeline, Agenda, Smart Drag, A1-A4, estados, notas/correcciones, enlaces de trabajo, filtros, feeds y Cloud.",
   "start_url": "./?pwa=1&v=44",
   "scope": "./",
