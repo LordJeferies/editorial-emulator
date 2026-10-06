@@ -1,9 +1,9 @@
 {
   "id": "./",
-  "name": "Editorial Emulator V4.2",
+  "name": "Editorial Emulator V4.3",
   "short_name": "Editorial",
-  "description": "Emulador editorial local-first con Smart Drag, clasificación A1-A4, filtros por tipo/familia/lote/orden, Board, Timeline, Agenda, feeds y Cloud sobre un runtime estable.",
-  "start_url": "./?pwa=1&v=42",
+  "description": "Emulador editorial local-first con Smart Drag, A1-A4, estados de producción, notas/correcciones por ficha, enlaces de trabajo, filtros editoriales, Board, Timeline, Agenda, feeds y Cloud.",
+  "start_url": "./?pwa=1&v=43",
   "scope": "./",
   "display": "standalone",
   "background_color": "#050506",
@@ -18,29 +18,11 @@
     }
   ],
   "shortcuts": [
-    {
-      "name": "Plan",
-      "url": "./?v=42#plan"
-    },
-    {
-      "name": "Feeds",
-      "url": "./?v=42#feeds"
-    },
-    {
-      "name": "Biblioteca",
-      "url": "./?v=42#library"
-    },
-    {
-      "name": "MCP",
-      "url": "./mcp.html?v=42"
-    },
-    {
-      "name": "Ayuda",
-      "url": "./help.html?v=42"
-    }
+    {"name":"Plan","url":"./?v=43#plan"},
+    {"name":"Feeds","url":"./?v=43#feeds"},
+    {"name":"Biblioteca","url":"./?v=43#library"},
+    {"name":"MCP","url":"./mcp.html?v=43"},
+    {"name":"Ayuda","url":"./help.html?v=43"}
   ],
-  "display_override": [
-    "window-controls-overlay",
-    "standalone"
-  ]
+  "display_override": ["window-controls-overlay","standalone"]
 }
