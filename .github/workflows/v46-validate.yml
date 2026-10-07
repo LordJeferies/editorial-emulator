@@ -1,0 +1,44 @@
+name: Validate Emulator Runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'js/**'
+      - 'css/**'
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'supabase-config.js'
+      - '.github/workflows/v46-validate.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check js/bootstrap-v46.js
+          node --check js/planner-layout-v46.js
+          node --check js/planner-v44.js
+          node --check js/flexible-week-v33.js
+          node --check js/catalog-v45.js
+          node --check js/dnd-v40.js
+          node --check js/smart-drag-v42.js
+          node --check js/workflow-data-v43.js
+          node --check js/workflow-ui-v44.js
+          node --check js/workflow-create-v43.js
+          node --check js/workflow-filters-v43.js
+          node --check js/workflow-sync-v43.js
+          node --check sw.js
+      - name: Check manifest
+        run: python -m json.tool manifest.webmanifest >/dev/null
+      - name: Check V4.6 wiring
+        run: |
+          grep -q 'bootstrap-v46.js?v=46' supabase-config.js
+          grep -q 'planner-layout-v46.js?v=46' js/bootstrap-v46.js
+          grep -q 'system-v46.css' sw.js
+          grep -q 'Editorial Emulator V4.6' index.html
+          grep -q 'Editorial Emulator V4.6' manifest.webmanifest
