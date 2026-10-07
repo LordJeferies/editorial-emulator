@@ -1,14 +1,14 @@
 {
   "id": "./",
-  "name": "Editorial Emulator V4.8",
+  "name": "Editorial Emulator V4.9",
   "short_name": "Editorial",
   "lang": "es-419",
-  "description": "Emulador editorial local-first con Board estable, biblioteca de contenido integrada sin overlays, diseño monocromo con detalles semánticos, responsive en desktop y PWA iPhone, Timeline, Agenda, Smart Drag, A1-A4, estados, notas/correcciones, enlaces, filtros, feeds y Cloud.",
-  "start_url": "./?pwa=1&v=48",
+  "description": "Emulador editorial local-first con Board estable, biblioteca inline tipo acordeón debajo del planner, diseño monocromo con color semántico, responsive en desktop y PWA iPhone, Timeline, Agenda, Smart Drag, A1-A4, estados, notas/correcciones, enlaces, filtros, feeds y Cloud.",
+  "start_url": "./?pwa=1&v=49",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050506",
-  "theme_color": "#050506",
+  "background_color": "#050505",
+  "theme_color": "#050505",
   "orientation": "any",
   "icons": [
     {
@@ -19,11 +19,11 @@
     }
   ],
   "shortcuts": [
-    {"name":"Plan","url":"./?v=48#plan"},
-    {"name":"Feeds","url":"./?v=48#feeds"},
-    {"name":"Biblioteca","url":"./?v=48#library"},
-    {"name":"MCP","url":"./mcp.html?v=48"},
-    {"name":"Ayuda","url":"./help.html?v=48"}
+    {"name":"Plan","url":"./?v=49#plan"},
+    {"name":"Feeds","url":"./?v=49#feeds"},
+    {"name":"Biblioteca","url":"./?v=49#library"},
+    {"name":"MCP","url":"./mcp.html?v=49"},
+    {"name":"Ayuda","url":"./help.html?v=49"}
   ],
   "display_override": ["window-controls-overlay","standalone"]
 }
