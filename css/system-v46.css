@@ -1,0 +1,131 @@
+/* Editorial Emulator V4.6 · Board width/class-collision fix */
+
+/*
+Root cause fixed in V4.6:
+#v30Surface was receiving the same .v30-board class as its child Board.
+That made the surface itself a seven-column grid; the real Board occupied only
+column 1 and then split that narrow column into seven more columns.
+*/
+
+html[data-planner="v46"] #dayTabs,
+html[data-planner="v46"] #weekBoard,
+html[data-planner="v46"] #contentRailShell{
+  display:none!important;
+}
+
+#plannerV30{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+#v37Workbench,
+.v45-drawer-workbench,
+.v37-workbench{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+/* The surface is a neutral full-width container, never a Board grid. */
+#v30Surface.v30-surface{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  grid-template-columns:none!important;
+  grid-auto-columns:auto!important;
+  grid-auto-flow:row!important;
+  overflow:visible!important;
+  container-type:normal!important;
+}
+
+/* Only the child is the actual Board grid. */
+#v30Surface > .v30-board{
+  display:grid!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;
+  grid-auto-columns:auto!important;
+  gap:8px!important;
+  overflow:visible!important;
+  align-items:start!important;
+}
+
+#v30Surface > .v30-board > .v30-day{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:150px!important;
+}
+
+#v30Surface > .v30-board .v30-day > header{
+  min-width:0!important;
+  padding:9px 9px!important;
+}
+
+#v30Surface > .v30-board .v30-day > header > div{
+  min-width:0!important;
+}
+
+#v30Surface > .v30-board .v30-day > header b{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:12px;
+}
+
+#v30Surface > .v30-board .v30-day > header small{
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#v30Surface > .v30-board .v30-daylist{
+  min-width:0!important;
+  min-height:82px!important;
+}
+
+#v30Surface > .v30-board .v30-dropempty{
+  min-height:72px!important;
+  padding:10px 6px!important;
+}
+
+/* The content library remains an overlay; opening it never changes Board width. */
+.v37-library{
+  max-width:min(520px,calc(100vw - 110px))!important;
+}
+
+/* Responsive topology is based on the viewport, not a contained element that may
+   have incorrect intrinsic size. */
+@media (max-width:1199px) and (min-width:901px){
+  #v30Surface > .v30-board{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+}
+
+@media (max-width:900px) and (min-width:641px){
+  #v30Surface > .v30-board{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
+@media (max-width:640px){
+  #v30Surface > .v30-board{
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+  }
+
+  #v30Surface > .v30-board > .v30-day{
+    min-height:0!important;
+  }
+
+  #v30Surface > .v30-board .v30-daylist{
+    min-height:0!important;
+  }
+}
