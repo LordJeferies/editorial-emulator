@@ -8,9 +8,9 @@ on:
       - 'supabase-config.js'
       - 'sw.js'
       - 'manifest.webmanifest'
-      - 'js/bootstrap-v48.js'
-      - 'js/catalog-inline-v48.js'
-      - 'css/system-v48.css'
+      - 'js/bootstrap-v49.js'
+      - 'js/catalog-inline-v49.js'
+      - 'css/system-v49.css'
       - '.github/workflows/v45-validate.yml'
 
 jobs:
@@ -22,14 +22,16 @@ jobs:
         run: |
           node --check supabase-config.js
           node --check sw.js
-          node --check js/bootstrap-v48.js
-          node --check js/catalog-inline-v48.js
+          node --check js/bootstrap-v49.js
+          node --check js/catalog-inline-v49.js
       - name: Check manifest JSON
         run: python -m json.tool manifest.webmanifest >/dev/null
       - name: Check canonical boot wiring
         run: |
           test "$(grep -c '<script' index.html)" -eq 1
-          grep -q 'bootstrap-v48.js?v=48' supabase-config.js
-          grep -q 'catalog-inline-v48.js?v=48' js/bootstrap-v48.js
-          grep -q 'system-v48.css' sw.js
-          grep -q 'Editorial Emulator V4.8' manifest.webmanifest
+          grep -q 'supabase-config.js?v=49' index.html
+          grep -q 'bootstrap-v49.js?v=49' supabase-config.js
+          grep -q 'catalog-inline-v49.js?v=49' js/bootstrap-v49.js
+          grep -q 'system-v49.css' sw.js
+          grep -q 'Editorial Emulator V4.9' manifest.webmanifest
+          ! grep -q 'catalog-portal-v47.js' js/bootstrap-v49.js
