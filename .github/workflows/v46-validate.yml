@@ -20,7 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check JavaScript syntax
         run: |
-          node --check js/bootstrap-v46.js
+          node --check js/bootstrap-v47.js
+          node --check js/catalog-portal-v47.js
           node --check js/planner-layout-v46.js
           node --check js/planner-v44.js
           node --check js/flexible-week-v33.js
@@ -35,10 +36,10 @@ jobs:
           node --check sw.js
       - name: Check manifest
         run: python -m json.tool manifest.webmanifest >/dev/null
-      - name: Check V4.6 wiring
+      - name: Check V4.7 wiring
         run: |
-          grep -q 'bootstrap-v46.js?v=46' supabase-config.js
-          grep -q 'planner-layout-v46.js?v=46' js/bootstrap-v46.js
-          grep -q 'system-v46.css' sw.js
-          grep -q 'Editorial Emulator V4.6' index.html
-          grep -q 'Editorial Emulator V4.6' manifest.webmanifest
+          grep -q 'bootstrap-v47.js?v=47' supabase-config.js
+          grep -q 'catalog-portal-v47.js?v=47' js/bootstrap-v47.js
+          grep -q 'system-v47.css' sw.js
+          grep -q 'catalog-portal-v47.js' sw.js
+          grep -q 'Editorial Emulator V4.7' manifest.webmanifest
