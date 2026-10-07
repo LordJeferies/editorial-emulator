@@ -1,0 +1,134 @@
+/* Editorial Emulator V4.9 · inline accordion content area + grayscale product polish */
+:root{
+  --bg:#050505;
+  --surface:#0b0b0c;
+  --surface2:#111113;
+  --surface3:#18181b;
+  --text:#f5f5f6;
+  --muted:#96969e;
+  --line:#29292e;
+  --accent:#f5f5f6;
+  --r:13px;
+  --tap:42px;
+  --v49-gap:10px;
+}
+
+html,body{background:#050505!important;color:var(--text)!important}
+body{letter-spacing:-.006em}
+.glass-panel,.glass-nav,.toolbar,.feed-toolbar,.panel,.v30-planner,.v37-library{background:#0b0b0c!important;border-color:var(--line)!important;box-shadow:none!important}
+.glass-panel,.glass-nav{backdrop-filter:blur(16px) saturate(105%)!important;-webkit-backdrop-filter:blur(16px) saturate(105%)!important}
+.side-nav,.topbar{background:rgba(6,6,7,.98)!important}
+.side-brand,.brand-mark,.btn-accent{background:#f1f1f2!important;color:#080809!important}
+.side-item.active{background:#18181b!important;color:#fff!important}
+.btn,.icon-btn,.seg,.chips button,.platform-tabs button,.library-tabs button{background:#121214!important;border-color:#2b2b30!important}
+.btn-primary,.chips button.active,.platform-tabs button.active,.library-tabs button.active,.seg button.active{background:#f2f2f3!important;color:#09090a!important;border-color:#f2f2f3!important}
+.btn-danger{background:rgba(255,95,109,.08)!important;color:#ff8993!important;border-color:rgba(255,95,109,.28)!important}
+.status.ok{color:var(--green)!important}.lot{color:#d0d0d5!important}
+
+.btn,.icon-btn{min-height:42px!important;border-radius:10px!important}
+.seg{padding:3px!important;border-radius:10px!important}.seg button{height:34px!important;border-radius:7px!important;font-weight:720!important}
+.toolbar,.feed-toolbar{padding:8px 9px!important;border-radius:12px!important}
+.hero-row h1{letter-spacing:-.035em!important;line-height:1!important}
+.eyebrow{font-size:9px!important;letter-spacing:.13em!important;color:#8f8f97!important}
+.topbar{height:66px!important}.workspace{padding-top:calc(66px + env(safe-area-inset-top) + 22px)!important}
+
+/* V4.9: workbench is always one vertical flow: planner first, content accordion second. */
+#v47LibraryPortal{display:none!important}
+#v37Workbench.v49-inline-workbench,.v49-inline-workbench{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  gap:12px!important;
+  padding:12px 14px 14px!important;
+  position:relative!important;
+}
+.v49-inline-workbench>#v30Surface{order:1;width:100%!important;min-width:0!important;max-width:none!important}
+.v49-accordion-trigger{order:2;width:100%;min-height:48px;border:1px solid #2a2a2f;background:#0d0d0f;color:#f3f3f4;border-radius:12px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font-weight:760}
+.v49-accordion-trigger:hover{background:#111114;border-color:#38383f}
+.v49-accordion-trigger .v49-trigger-copy{display:flex;align-items:center;gap:10px;min-width:0}
+.v49-accordion-trigger .v49-trigger-copy span{color:#8f8f97;font-size:11px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v49-accordion-trigger .v49-trigger-meta{display:flex;align-items:center;gap:8px;flex:0 0 auto;color:#b9b9c0;font-size:11px}
+.v49-accordion-trigger .v49-chevron{font-size:16px;line-height:1;transition:transform .12s ease}
+html.v49-library-open .v49-accordion-trigger .v49-chevron{transform:rotate(180deg)}
+
+.v49-inline-workbench>.v37-library{
+  order:3;
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+  width:100%!important;max-width:none!important;min-width:0!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;transform:none!important;opacity:1!important;pointer-events:auto!important;
+  contain:layout style!important;
+  border:1px solid #2a2a2f!important;border-radius:13px!important;
+  background:#0c0c0e!important;box-shadow:none!important;margin:0!important;
+}
+.v49-inline-workbench>.v37-library[hidden]{display:none!important}
+.v49-inline-workbench>.v37-library .v30-catalog-head{padding:12px 13px 9px!important;border-bottom:1px solid #232327!important;background:#0d0d0f!important}
+.v49-inline-workbench>.v37-library .v37-library-title b{font-size:14px!important;letter-spacing:-.01em!important}
+.v49-inline-workbench>.v37-library .v37-library-title small{font-size:10px!important;color:#8e8e96!important}
+.v49-inline-workbench>.v37-library .v37-library-tools{padding:10px 12px 8px!important;background:#0c0c0e!important}
+.v49-inline-workbench>.v37-library input,.v49-inline-workbench>.v37-library select{background:#09090a!important;color:#f4f4f5!important;border-color:#2b2b30!important;border-radius:9px!important}
+
+/* Multiple contents visible at once, with a bounded internal scroll only for long libraries. */
+.v49-inline-workbench>.v37-library #v30Catalog{
+  width:100%!important;min-width:0!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:9px!important;align-content:start!important;
+  padding:10px 12px 12px!important;
+  max-height:min(48dvh,520px)!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;
+  background:#080809!important;
+}
+.v49-inline-workbench>.v37-library .v30-source{width:100%!important;min-width:0!important;max-width:none!important;min-height:132px!important;border:1px solid #29292f!important;border-radius:11px!important;background:#121214!important;box-shadow:none!important}
+.v49-inline-workbench>.v37-library .v30-source:hover{background:#151518!important;border-color:#3a3a40!important}
+.v49-inline-workbench>.v37-library .v30-add{background:#1a1a1d!important;border-color:#323238!important;border-radius:8px!important}
+
+/* Board stays full width and untouched when accordion opens. */
+#v30Surface{width:100%!important;min-width:0!important;max-width:none!important}
+#v30Surface>.v30-board{width:100%!important;min-width:0!important}
+.v30-day{background:#0d0d0f!important;border-color:#29292f!important;border-radius:12px!important}
+.v30-plan-card{background:#141417!important;border-color:#2c2c32!important;border-radius:10px!important}
+
+/* Smart Drag collapses only the content section; planner dimensions never change. */
+html.v42-smart-dragging .v49-inline-workbench>.v37-library{max-height:64px!important;overflow:hidden!important;opacity:.55!important;pointer-events:none!important}
+html.v42-smart-dragging .v49-inline-workbench>.v37-library .v37-library-tools,
+html.v42-smart-dragging .v49-inline-workbench>.v37-library .v42-filters,
+html.v42-smart-dragging .v49-inline-workbench>.v37-library .v43-flow-filters,
+html.v42-smart-dragging .v49-inline-workbench>.v37-library #v30Catalog{opacity:0!important}
+
+/* Color is reserved for semantic details: A1-A4, status, corrections and drop targets. */
+.v42-order-chip{font-weight:850!important}
+.v43-status-pill,.v43-attn{border-radius:999px!important}
+.v30-day.v30-drop-active,.v42-day-target.v42-drop-active{box-shadow:0 0 0 2px rgba(93,168,255,.82),0 10px 24px rgba(0,0,0,.28)!important}
+
+@media(max-width:1440px){.v49-inline-workbench>.v37-library #v30Catalog{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:1180px){.v49-inline-workbench>.v37-library #v30Catalog{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:900px){
+  .v49-inline-workbench{padding:10px!important;gap:9px!important}
+  .v49-inline-workbench>.v37-library #v30Catalog{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:min(52dvh,520px)!important;padding:8px 9px 10px!important}
+  .v49-inline-workbench>.v37-library .v30-source{min-height:122px!important}
+  .v49-accordion-trigger{min-height:46px;padding:0 12px}
+}
+@media(max-width:640px){
+  :root{--tap:44px}
+  .workspace{padding-left:10px!important;padding-right:10px!important}
+  .v49-inline-workbench{padding:8px 0 10px!important;gap:8px!important}
+  .v49-accordion-trigger{border-left:0;border-right:0;border-radius:10px;min-height:48px}
+  .v49-inline-workbench>.v37-library{border-left:0!important;border-right:0!important;border-radius:10px!important}
+  .v49-inline-workbench>.v37-library #v30Catalog{grid-template-columns:1fr!important;max-height:min(56dvh,560px)!important;gap:7px!important;padding:8px!important}
+  .v49-inline-workbench>.v37-library .v30-source{min-height:116px!important}
+  .v49-inline-workbench>.v37-library .v37-library-tools{padding:8px!important}
+  .v49-inline-workbench>.v37-library .v30-catalog-head{padding:10px 9px 8px!important}
+  .v42-filters{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .v43-flow-filters{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:430px){
+  .v42-filters,.v43-flow-filters{grid-template-columns:1fr!important}
+  .v49-accordion-trigger .v49-trigger-copy span{display:none}
+}
+@media(prefers-reduced-motion:reduce){.v49-accordion-trigger .v49-chevron{transition:none!important}}
