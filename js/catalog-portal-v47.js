@@ -8,7 +8,7 @@ function mount(){if(mounted){sync();return true}const candidate=$('.v37-library'
 function ensure(){if(mount())return;if(++tries>80)return;setTimeout(ensure,50)}
 ['editorial:catalog-state','editorial:planner-rendered','editorial:boot-ready','editorial:scenariochange'].forEach(ev=>window.addEventListener(ev,()=>{mount();sync()},{passive:true}));
 window.addEventListener('resize',sync,{passive:true});
-document.addEventListener('click',e=>{const nav=e.target.closest?.('[data-nav]');if(!nav)return;queueMicrotask(()=>{if(nav.dataset.nav!=='plan')window.EDITORIAL_CATALOG_V45?.close?.();sync()})},true);
+document.addEventListener('click',e=>{const nav=e.target.closest?.('[data-nav]'),home=e.target.closest?.('#scenarioHomeBtn');if(!nav&&!home)return;queueMicrotask(()=>{if(home||nav?.dataset.nav!=='plan')window.EDITORIAL_CATALOG_V45?.close?.();sync()})},true);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensure,{once:true});else ensure();
 window.EDITORIAL_CATALOG_PORTAL_V47={mount:()=>mount(),sync:()=>sync()};
 })();
